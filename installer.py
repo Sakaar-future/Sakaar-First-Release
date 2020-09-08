@@ -19,7 +19,7 @@ def get_conf():
 		conf = shelve.open('conf')
 	return conf
 get_conf()
-conf['Connected'] = ['bd6498585bff.ngrok.io']
+conf['Connected'] = ['194aa871eb04.ngrok.io']
 conf['Version'] = '1.000'
 conf['OurWallets'] = ['BTC','SKR']
 systems = {

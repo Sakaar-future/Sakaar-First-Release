@@ -96,47 +96,6 @@ def PBKDF1(password, salt, dkLen, count=1000, hashAlgo=None):
 
 
 def PBKDF2(password, salt, dkLen=16, count=1000, prf=None, hmac_hash_module=None):
-    """Derive one or more keys from a password (or passphrase).
-
-    This function performs key derivation according to the PKCS#5 standard (v2.0).
-
-    Args:
-     password (string or byte string):
-        The secret password to generate the key from.
-     salt (string or byte string):
-        A (byte) string to use for better protection from dictionary attacks.
-        This value does not need to be kept secret, but it should be randomly
-        chosen for each derivation. It is recommended to use at least 16 bytes.
-     dkLen (integer):
-        The cumulative length of the keys to produce.
-
-        Due to a flaw in the PBKDF2 design, you should not request more bytes
-        than the ``prf`` can output. For instance, ``dkLen`` should not exceed
-        20 bytes in combination with ``HMAC-SHA1``.
-     count (integer):
-        The number of iterations to carry out. The higher the value, the slower
-        and the more secure the function becomes.
-
-        You should find the maximum number of iterations that keeps the
-        key derivation still acceptable on the slowest hardware you must support.
-
-        Although the default value is 1000, **it is recommended to use at least
-        1000000 (1 million) iterations**.
-     prf (callable):
-        A pseudorandom function. It must be a function that returns a
-        pseudorandom byte string from two parameters: a secret and a salt.
-        The slower the algorithm, the more secure the derivation function.
-        If not specified, **HMAC-SHA1** is used.
-     hmac_hash_module (module):
-        A module from ``.`` implementing a Merkle-Damgard cryptographic
-        hash, which PBKDF2 must use in combination with HMAC.
-        This parameter is mutually exclusive with ``prf``.
-
-    Return:
-        A byte string of length ``dkLen`` that can be used as key material.
-        If you want multiple keys, just break up this string into segments of the desired length.
-    """
-
     password = tobytes(password)
     salt = tobytes(salt)
 

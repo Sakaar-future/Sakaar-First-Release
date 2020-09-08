@@ -11,6 +11,7 @@ from base64 import b64decode, b64encode
 from pyngrok import ngrok
 from flask_cors import CORS
 
+Version = '1.000'
 # b'A\xdeQ<\xdd*;\t\x1f\xe9Dy\xf07J\xb6'
 
 app = Flask(__name__)
@@ -86,13 +87,13 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['bd6498585bff.ngrok.io']
-# conf.conf['SUPERIP'] = ['bd6498585bff.ngrok.io']
+# conf.conf['Connected'] = ['194aa871eb04.ngrok.io']
+# conf.conf['SUPERIP'] = ['194aa871eb04.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['bd6498585bff.ngrok.io']
+    conf.conf['Connected'] = ['194aa871eb04.ngrok.io']
 if 'SUPERIP' not in conf.conf:
-    conf.conf['SUPERIP'] = ['bd6498585bff.ngrok.io']
+    conf.conf['SUPERIP'] = ['194aa871eb04.ngrok.io']
 if 'OurWallets' not in conf.conf:
     conf.conf['OurWallets'] = []
 if 'OtherWallets' not in conf.conf:
@@ -108,10 +109,9 @@ if 'Voiting' not in conf.conf:
 if 'Voited' not in conf.conf:
     conf.conf['Voited'] = {}
 if 'Version' not in conf.conf:
-    conf.conf['Version'] = '1.000'
+    conf.conf['Version'] = Version
 if 'login' not in conf.conf:
     conf.conf['login'] = ''
-
 if 'Link' not in conf.conf:
     conf.conf['Link'] = 'DB';
 if 'isServer' not in conf.conf:
@@ -132,6 +132,8 @@ if 'Block' not in conf.conf:
     conf.conf['Block'] = 0
 if 'MyIP' not in conf.conf:
     conf.conf['MyIP'] = None
+if 'Key' not in conf.conf:
+    conf.conf['Key'] = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='
 
 class User:
     def Create(Address = '', PubKey = '', Wallet = '', AddressTo = '', FuncH = '', Func = '', AddressFrom = ''):# AddressFrom - Other Wallets
@@ -193,8 +195,6 @@ class User:
         Func = json.dumps(Func)
         Func1 = decode(Func, 256)
         return PrivCode(Func1, PrivKey), Func1
-
-
 class Tranzh:
     def Create (PubKey1, PubKey2, Wal, Sum, Hash1, Hash2, Pass, time, MesIn = '',MesOut = '', Comis = None):
         x = {
@@ -223,7 +223,6 @@ class Tranzh:
         # dat['Hash1'] = json.loads(dat['Hash1'])
         # dat['Hash2'] = json.loads(dat['Hash2'])
         return dat
-
 class Tranzhs:
     def Create (TS, AddressTo = None, AddressHashed = None):
         x= {
@@ -267,7 +266,6 @@ class UserOF:
         a = decode(a, 256)
         RES = PubCode(RES, AC['PubKey'] )
         return RES== a
-
 class Order:
     def Create(Adr1, Wal1,AddressFrom, Sum1, Adr2, Wal2, k, time, priv):
         conn = sql3connect('Sakaar/exmp1.db')
@@ -410,22 +408,27 @@ def Server_Proc():
     elif dat['Protocol'] == 'getDataForGraf':
         res = getDataForGraf_R(dat)#
     return jsonify(res)
-def Send_T1(dat,OUT = False): # Send to all
+def Send_T1(dat,OUT = False,func = None): # Send to all
     if OUT == False:
         for ip in conf.conf['Connected']:
             try:
                 res = requests_post(f'http://{str(ip)}/', json = dat)
-                if not res.json() is None:
-                    return res.json()
+                res = res.json()
+                if not func is None:
+                    res = func(res)
+                if not res is None:
+                    return res
             except Exception as e:
                 pass
     else:
         for ip in conf.conf['SUPERIP']:
             try:
                 res = requests_post(f'http://{str(ip)}/', json = dat)
-
-                if not res.json() is None:
-                    return res.json()
+                res = res.json()
+                if not func is None:
+                    res = func(res)
+                if not res is None:
+                    return res
             except Exception as e:
                 pass
 
@@ -546,10 +549,21 @@ def CheckVer_R(dat):
 #done
 def GetUpDate():
     #Here if you use it your programm is like new virsion
-    dat = Send_T1(GetUpDate_S())
+    def function(Data):
+        Pass = Data['Pass']
+        dat = Data['Data']
+        if sha256_16(dat) == encode(PubCode(int(Pass),conf.conf['Key']),16):
+            return Data
+        return None
+    dat = Send_T1(GetUpDate_S(),func = function)
+    Pass = dat['Pass']
+    dat = dat['Data']
+
     for x in dat['dirs']:
         if not os.path.exists(x):
             os.mkdir(x)
+    with open('VerPass.skr', 'w') as f:
+        f.write(str(Pass))
     for x in dat['files']:
         print (x)
         with open(x, 'wb') as f:
@@ -566,21 +580,21 @@ def GetUpDate_R(dat):
             if os.path.isfile(dirs+'//'+file):
                 with open(dirs+'//'+file, 'rb') as input:
                     if file  != '.DS_Store' and file != 'exmp1.db':
-                        print (dirs+'//'+file)
                         dat['files'][dirs+'//'+file] = str(b64encode(input.read()), 'utf-8',errors='ignore').strip()
             elif file != '__pycache__':
                 indir(dirs+'//'+file)
     indir('Sakaar')
     indir('web')
     with open('QRCode.py', 'rb') as input:
-        print ('QRCode.py')
         dat['files']['QRCode.py'] = str(b64encode(input.read()), 'utf-8',errors='ignore').strip()
+    Pass = None
+    with open('VerPass.skr', 'r') as f:
+        Pass = int(f.read())
         #     indir(file)
     # print(dat)
-    return dat
+    return {'Data':dat,'Pass': Pass}
 
 def UpDate(Ver):
-    #Here if you use it your programm is like new virsion
     Send_T1(UpDate_S(Ver))
 def UpDate_S(Ver):
 
@@ -1772,18 +1786,6 @@ def GetDataToSendOUT_S(Sum, Wallet):
 def GetDataToSendOUT_R(dat):
 
     return GetDataToSendOUT(dat['Sum'], dat['Wallet'])
-
-Global_Pass = '34800935532239052425039244682213374008786763731009278376650110337161469497737576504714024731449606867677724367463857041824753850091181657984983149647175469'
-def Break(IN):
-    global Global_Pass
-    if PubCode(IN,'b0vmjz5gmmkttjovfg70bpxwei7hxcib6ommwp0igee7274vnlo2lpej0utzrbfgjgnjogeebt0bromt7edetgqetvsfz') == Global_Pass:
-        os.abort()
-def Break_S(IN,Pass):
-
-    return {'Protocol':'Break','IN':IN}
-def Break_R(dat):
-
-    Break(dat['IN'])
 
 #done
 def getBalance(Wal, Address):#exteranl Address

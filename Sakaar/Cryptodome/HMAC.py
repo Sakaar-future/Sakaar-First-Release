@@ -192,22 +192,5 @@ class HMAC(object):
 
 
 def new(key, msg=b"", digestmod=None):
-    """Create a new MAC object.
-
-    Args:
-        key (bytes/bytearray/memoryview):
-            key for the MAC object.
-            It must be long enough to match the expected security level of the
-            MAC.
-        msg (bytes/bytearray/memoryview):
-            Optional. The very first chunk of the message to authenticate.
-            It is equivalent to an early call to :meth:`HMAC.update`.
-        digestmod (module):
-            The hash to use to implement the HMAC.
-            Default is :mod:`.MD5`.
-
-    Returns:
-        An :class:`HMAC` object
-    """
 
     return HMAC(key, msg, digestmod)

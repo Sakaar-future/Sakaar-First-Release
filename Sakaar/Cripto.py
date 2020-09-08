@@ -4,51 +4,52 @@ from .Cryptodome.KDF import PBKDF2
 from base64 import b64decode, b64encode
 
 systems = {
-	2: '01',
-	10: '0123456789',
-	16: '0123456789abcdef',
-	32: 'abcdefghijklmnopqrstuvwxyz234567',
-	33: 'abcdefghijklmnopqrstuvwxyz2345670',
-	64: '0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm/+',
-	256: ''.join([chr(x) for x in range(256)])
+    2: '01',
+    10: '0123456789',
+    16: '0123456789abcdef',
+    32: 'abcdefghijklmnopqrstuvwxyz234567',
+    33: 'abcdefghijklmnopqrstuvwxyz2345670',
+    64: '0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm/+',
+    256: ''.join([chr(x) for x in range(256)])
 }
 def encode(val, base, minlen=0):
-	val = int(val)
-	base, minlen = int(base), int(minlen)
-	code_string = get_code_string(base)
-	result = ''
-	while val > 0:
-		result = code_string[val % base] + result
-		val //= base
-	return code_string[0] * max(minlen - len(result), 0) + result
+    val = int(val)
+    base, minlen = int(base), int(minlen)
+    code_string = get_code_string(base)
+    result = ''
+    while val > 0:
+        result = code_string[val % base] + result
+        val //= base
+    return code_string[0] * max(minlen - len(result), 0) + result
 def decode(string, base):
-	string = str(string)
-	base = int(base)
-	code_string = get_code_string(base)
-	result = 0
-	if base == 16:
-		string = string.lower()
-	while len(string) > 0:
-		result *= base
-		result += code_string.find(string[0])
-		string = string[1:]
-	return int(result)
+    string = str(string)
+    base = int(base)
+    code_string = get_code_string(base)
+    result = 0
+    if base == 16:
+        string = string.lower()
+    while len(string) > 0:
+        result *= base
+        result += code_string.find(string[0])
+        string = string[1:]
+    return int(result)
 def get_code_string(base):
-	if base in systems:
-		return systems[base]
-	else:
-		raise ValueError("Invalid base!")
+    if base in systems:
+        return systems[base]
+    else:
+        raise ValueError("Invalid base!")
 def generate_keys(bits = 1024):
     private_key = RSA.generate(bits)
     public_key = private_key.publickey()
     # importKey
     return private_key , public_key
 def sha256_16(arc):
-	return hashlib.sha256(str(arc).encode()).hexdigest()
+    return hashlib.sha256(str(arc).encode()).hexdigest()
 
 def generate_Private(password,bits = 1024): #class type
     salt = sha256_16(password)     # replace with random salt if you can store one
     master_key = PBKDF2(password, salt, count=10000)  # bigger count = better
+    # print(master_key)
     def my_rand(n):
         my_rand.counter += 1
         return PBKDF2(master_key, "my_rand:%d" % my_rand.counter, dkLen=n, count=1)
@@ -63,32 +64,32 @@ def get_string(key, format = 'PEM'):
 def get_Private(arc):
     return get_string(generate_Private(arc))
 def PrivToPub(password):
-	priv = generate_Private(password)
-	lol = get_string(get_Public(priv))
-	return lol
+    priv = generate_Private(password)
+    lol = get_string(get_Public(priv))
+    return lol
 def PubToAdr(Public):
-	Public = str(Public).encode()
-	public_key = RSA.importKey(Public)
-	Adress = get_string(public_key,'OpenSSH')
-	return Adress
+    Public = str(Public).encode()
+    public_key = RSA.importKey(Public)
+    Adress = get_string(public_key,'OpenSSH')
+    return Adress
 def AdrToPub(Adress):
-	Adress = b'Sakaar: ' + str(Adress).encode()
-	public_key = RSA.importKey(Adress)
-	Public = get_string(public_key)
-	return Public
+    Adress = b'Sakaar: ' + str(Adress).encode()
+    public_key = RSA.importKey(Adress)
+    Public = get_string(public_key)
+    return Public
 
 
 
 def PubCode(message, public_key):
-	message = int(message)
-	public_key = str(public_key)
-	public_key = RSA.importKey(public_key.encode())
-	# return public_key.encrypt(message)
-	return int(public_key.encrypt(message))
+    message = int(message)
+    public_key = str(public_key)
+    public_key = RSA.importKey(public_key.encode())
+    # return public_key.encrypt(message)
+    return int(public_key.encrypt(message))
 
 def PrivCode(ciphertext, private_key):
-	ciphertext = int(ciphertext)
-	private_key = generate_Private(private_key)
-	ciphertext = str ( ciphertext)
-	# return private_key.decrypt(ciphertext)
-	return int(private_key.decrypt(ciphertext))
+    ciphertext = int(ciphertext)
+    private_key = generate_Private(private_key)
+    ciphertext = str ( ciphertext)
+    # return private_key.decrypt(ciphertext)
+    return int(private_key.decrypt(ciphertext))

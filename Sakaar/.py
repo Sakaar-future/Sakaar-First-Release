@@ -269,8 +269,8 @@ class RsaKey(object):
               scheme is used. The following operations are performed:
 
                 1. A 16 byte Triple DES key is derived from the passphrase
-                   using :func:`Sakaar.Cryptodome.Protocol.KDF.PBKDF2` with 8 bytes salt,
-                   and 1 000 iterations of :mod:`Sakaar.Cryptodome.Hash.HMAC`.
+                   using :func:`Sakaar.Crypro_Core.Protocol.KDF.PBKDF2` with 8 bytes salt,
+                   and 1 000 iterations of :mod:`Sakaar.Crypro_Core.Hash.HMAC`.
                 2. The private key is encrypted using CBC.
                 3. The encrypted key is encoded according to PKCS#8.
 
@@ -281,11 +281,11 @@ class RsaKey(object):
             (that is, ``pkcs=8``) and only if a pass phrase is present too.
 
             The supported schemes for PKCS#8 are listed in the
-            :mod:`Sakaar.Cryptodome.IO.PKCS8` module (see :attr:`wrap_algo` parameter).
+            :mod:`Sakaar.Crypro_Core.IO.PKCS8` module (see :attr:`wrap_algo` parameter).
 
           randfunc (callable):
             A function that provides random bytes. Only used for PEM encoding.
-            The default is :func:`Sakaar.Cryptodome.Random.get_random_bytes`.
+            The default is :func:`Sakaar.Crypro_Core.Random.get_random_bytes`.
 
         Returns:
           byte string: the encoded key
@@ -338,7 +338,7 @@ class RsaKey(object):
                 if format == 'DER' and passphrase:
                     raise ValueError("PKCS#1 private key cannot be encrypted")
             else:  # PKCS#8
-                from Sakaar.Cryptodome.IO import PKCS8
+                from Sakaar.Crypro_Core.IO import PKCS8
 
                 if format == 'PEM' and protection is None:
                     key_type = 'PRIVATE KEY'
@@ -360,7 +360,7 @@ class RsaKey(object):
         if format == 'DER':
             return binary_key
         if format == 'PEM':
-            from Sakaar.Cryptodome.IO import PEM
+            from Sakaar.Crypro_Core.IO import PEM
 
             pem_str = PEM.encode(binary_key, key_type, passphrase, randfunc)
             return tobytes(pem_str)
@@ -370,12 +370,12 @@ class RsaKey(object):
     # Backward compatibility
     exportKey = export_key
 
-    # Methods defined in PySakaar.Cryptodome that we don't support anymore
+    # Methods defined in PySakaar.Crypro_Core that we don't support anymore
     def sign(self, M, K):
-        raise NotImplementedError("Use module Sakaar.Cryptodome.Signature.pkcs1_15 instead")
+        raise NotImplementedError("Use module Sakaar.Crypro_Core.Signature.pkcs1_15 instead")
 
     def verify(self, M, signature):
-        raise NotImplementedError("Use module Sakaar.Cryptodome.Signature.pkcs1_15 instead")
+        raise NotImplementedError("Use module Sakaar.Crypro_Core.Signature.pkcs1_15 instead")
 
     def blind(self, M, B):
         raise NotImplementedError
@@ -413,7 +413,7 @@ def generate(bits, randfunc=None, e=65537):
         The FIPS standard only defines 1024, 2048 and 3072.
       randfunc (callable):
         Function that returns random bytes.
-        The default is :func:`Sakaar.Cryptodome.Random.get_random_bytes`.
+        The default is :func:`Sakaar.Crypro_Core.Random.get_random_bytes`.
       e (integer):
         Public RSA exponent. It must be an odd positive integer.
         It is typically a small number with very few ones in its
@@ -537,7 +537,7 @@ def construct(rsa_components, consistency_check=True):
         else:
             # Compute factors p and q from the private exponent d.
             # We assume that n has no more than two factors.
-            # See 8.2.2(i) in Handbook of Applied Sakaar.Cryptodomegraphy.
+            # See 8.2.2(i) in Handbook of Applied Sakaar.Crypro_Coregraphy.
             ktot = d * e - 1
             # The quantity d*e-1 is a multiple of phi(n), even,
             # and can be represented as t*2^s.
@@ -665,7 +665,7 @@ def _import_x509_cert(encoded, *kwargs):
 
 
 def _import_pkcs8(encoded, passphrase):
-    from Sakaar.Cryptodome.IO import PKCS8
+    from Sakaar.Crypro_Core.IO import PKCS8
 
     k = PKCS8.unwrap(encoded, passphrase)
     if k[0] != oid:
@@ -756,7 +756,7 @@ def import_key(extern_key, passphrase=None):
     .. _`OpenSSH 6.5`: https://flak.tedunangst.com/post/new-openssh-key-format-and-bcrypt-pbkdf
     """
 
-    from Sakaar.Cryptodome.IO import PEM
+    from Sakaar.Crypro_Core.IO import PEM
 
     extern_key = tobytes(extern_key)
     if passphrase is not None:

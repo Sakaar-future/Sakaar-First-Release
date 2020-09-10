@@ -87,13 +87,13 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['194aa871eb04.ngrok.io']
-# conf.conf['SUPERIP'] = ['194aa871eb04.ngrok.io']
+# conf.conf['Connected'] = ['9c87dfaa4ed5.ngrok.io']
+# conf.conf['SUPERIP'] = ['9c87dfaa4ed5.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['194aa871eb04.ngrok.io']
+    conf.conf['Connected'] = ['9c87dfaa4ed5.ngrok.io']
 if 'SUPERIP' not in conf.conf:
-    conf.conf['SUPERIP'] = ['194aa871eb04.ngrok.io']
+    conf.conf['SUPERIP'] = ['9c87dfaa4ed5.ngrok.io']
 if 'OurWallets' not in conf.conf:
     conf.conf['OurWallets'] = []
 if 'OtherWallets' not in conf.conf:
@@ -548,50 +548,48 @@ def CheckVer_R(dat):
     return conf.conf['Version']
 #done
 def GetUpDate():
-    #Here if you use it your programm is like new virsion
     def function(Data):
         Pass = Data['Pass']
-        dat = Data['Data']
-        if sha256_16(dat) == encode(PubCode(int(Pass),conf.conf['Key']),16):
+        Data['Data']['files'] = sorted(Data['Data']['files'])
+        if decode(sha256_16(Data['Data']),16) == PubCode(int(Pass),AdrToPub(conf['Key'])):
             return Data
         return None
     dat = Send_T1(GetUpDate_S(),func = function)
-    Pass = dat['Pass']
+    # print(dat)
+    Pass = int(dat['Pass'])
     dat = dat['Data']
-
     for x in dat['dirs']:
         if not os.path.exists(x):
             os.mkdir(x)
     with open('VerPass.skr', 'w') as f:
         f.write(str(Pass))
     for x in dat['files']:
-        print (x)
-        with open(x, 'wb') as f:
-            f.write(b64decode(bytes(dat['files'][x]),'utf-8'))
+        print (x[0])
+        with open(x[0], 'wb') as f:
+            f.write(b64decode(bytes(x[1],'utf-8')))
     UpDate()
 def GetUpDate_S():
 
     return {'Protocol':'GetUpDate'}
 def GetUpDate_R(dat):
-    dat = {'dirs':[],'files':{}}
+    dat = {'dirs':[],'files':[]}
     def indir(dirs):
         dat['dirs'].append(dirs)
         for file in os.listdir(dirs):
             if os.path.isfile(dirs+'//'+file):
                 with open(dirs+'//'+file, 'rb') as input:
                     if file  != '.DS_Store' and file != 'exmp1.db':
-                        dat['files'][dirs+'//'+file] = str(b64encode(input.read()), 'utf-8',errors='ignore').strip()
+                        dat['files'].append([dirs+'//'+file,str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
             elif file != '__pycache__':
                 indir(dirs+'//'+file)
     indir('Sakaar')
     indir('web')
     with open('QRCode.py', 'rb') as input:
-        dat['files']['QRCode.py'] = str(b64encode(input.read()), 'utf-8',errors='ignore').strip()
+        dat['files'].append(['QRCode.py',str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
     Pass = None
+    dat['files'] = sorted(dat['files'])
     with open('VerPass.skr', 'r') as f:
         Pass = int(f.read())
-        #     indir(file)
-    # print(dat)
     return {'Data':dat,'Pass': Pass}
 
 def UpDate(Ver):

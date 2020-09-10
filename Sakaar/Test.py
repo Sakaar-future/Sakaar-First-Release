@@ -1,5 +1,5 @@
 # # from tinyec.ec import SubGroup, Curve
-# from Cryptodome.random_1 import randint
+# from Crypro_Core.random_1 import randint
 # # from web3 import Web3
 # # p = int("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16)
 # # n = int("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", 16)
@@ -19,10 +19,10 @@
 # print(private_key)
 #
 #
-# from Cryptodome import AES
-# from Cryptodome.KDF import scrypt
-# from Cryptodome.Padding import pad, unpad
-# from Cryptodome.Random import get_random_bytes
+# from Crypro_Core import AES
+# from Crypro_Core.KDF import scrypt
+# from Crypro_Core.Padding import pad, unpad
+# from Crypro_Core.Random import get_random_bytes
 # import json
 # password = b"password"
 # salt = get_random_bytes(16)

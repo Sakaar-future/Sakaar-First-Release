@@ -1,6 +1,6 @@
-from .Cryptodome import RSA
+from CryptoCore.PublicKey import RSA
 import hashlib
-from .Cryptodome.KDF import PBKDF2
+from CryptoCore.Protocol.KDF import PBKDF2
 from base64 import b64decode, b64encode
 
 systems = {
@@ -93,3 +93,6 @@ def PrivCode(ciphertext, private_key):
     ciphertext = str ( ciphertext)
     # return private_key.decrypt(ciphertext)
     return int(private_key.decrypt(ciphertext))
+Key = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='
+print(PrivToPub(sha256_16('StiveMan1')) == AdrToPub(Key))
+# print(encode(PrivCode(PubCode(decode('hello',256),PrivToPub('lol')),'lol'),256))

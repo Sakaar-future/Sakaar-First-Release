@@ -87,13 +87,13 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['9c87dfaa4ed5.ngrok.io']
-# conf.conf['SUPERIP'] = ['9c87dfaa4ed5.ngrok.io']
+# conf.conf['Connected'] = ['3a5b182bacbf.ngrok.io']
+# conf.conf['SUPERIP'] = ['3a5b182bacbf.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['9c87dfaa4ed5.ngrok.io']
+    conf.conf['Connected'] = ['3a5b182bacbf.ngrok.io']
 if 'SUPERIP' not in conf.conf:
-    conf.conf['SUPERIP'] = ['9c87dfaa4ed5.ngrok.io']
+    conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:
     conf.conf['OurWallets'] = []
 if 'OtherWallets' not in conf.conf:
@@ -422,8 +422,9 @@ def Send_T1(dat,OUT = False,func = None): # Send to all
                 pass
     else:
         for ip in conf.conf['SUPERIP']:
+            ip1 = encode(PubCode(int(ip),AdrToPub(conf.conf['Key'])),256)
             try:
-                res = requests_post(f'http://{str(ip)}/', json = dat)
+                res = requests_post(f'http://{str(ip1)}/', json = dat)
                 res = res.json()
                 if not func is None:
                     res = func(res)
@@ -451,16 +452,7 @@ def AddMyIP():
         NewIP(conf.conf['MyIP'])
     elif conf.conf['MyIP'] not in conf.conf['Connected']:
         NewIP(conf.conf['MyIP'])
-def DeleteSUPERIP():
-    if conf.conf['MyIP'] != None and conf.conf['MyIP'] in conf.conf['SUPERIP']:
-        DelSUPERIP(conf.conf['MyIP'])
-def AddMySUPERIP():
-    if conf.conf['MyIP'] == None:
-        x = ngrok.connect(10101)
-        conf.conf['MyIP'] = (str(x)[7:])
-        NewSUPERIP(conf.conf['MyIP'])
-    elif conf.conf['MyIP'] not in conf.conf['SUPERIP']:
-        NewSUPERIP(conf.conf['MyIP'])
+
 
 #done
 def BecomNODA():
@@ -536,6 +528,11 @@ def SendOUT(Wal, Address, AddressTo, Sum):#Using our Address system and external
 
         SendTranzh(Tranzhs.Create(PreSendTranzh(dat), AddressTo, PrivCode(decode(kke['AddressFrom'] + AddressTo + str(Sum) + Wal, 256), lol) ))
 
+def install(package):
+    if hasattr(pip, 'main'):
+        pip.main(['install', package])
+    else:
+        pip._internal.main(['install', package])
 #
 def CheckVer():
     if Send_T1(CheckVer_S()) != conf.conf['Version']:
@@ -551,7 +548,7 @@ def GetUpDate():
     def function(Data):
         Pass = Data['Pass']
         Data['Data']['files'] = sorted(Data['Data']['files'])
-        if decode(sha256_16(Data['Data']),16) == PubCode(int(Pass),AdrToPub(conf['Key'])):
+        if decode(sha256_16(Data['Data']),16) == PubCode(int(Pass),AdrToPub(conf.conf['Key'])):
             return Data
         return None
     dat = Send_T1(GetUpDate_S(),func = function)
@@ -601,6 +598,7 @@ def UpDate_R(dat):
     if dat['Version'] != conf.conf['Version']:
         GetUpDate()
         UpDate(dat['Version'])
+        install('pyCryptoCorex')
         sys.exit(82)
         # ReBorn()
 #done
@@ -1649,11 +1647,10 @@ def RegistrOUT_R(dat):
     return RegistrOUT(dat['Wallet'], dat['AddressTo'])
 
 def DelSUPERIP(ip):
-    if not ip in conf.conf['SUPERIP']:
+    if not str(PubCode(int(ip),AdrToPub(conf.conf['Key']))) in conf.conf['SUPERIP']:
         return
-
     x = conf.conf['SUPERIP']
-    x.remove(ip)
+    x.remove(str(PubCode(int(ip),AdrToPub(conf.conf['Key']))))
     conf.conf['SUPERIP'] = x
     del x
     Send_T1(DelSUPERIP_S(ip))
@@ -1665,6 +1662,7 @@ def DelSUPERIP_R(dat):
     DelSUPERIP(dat['IP'])
 
 def NewSUPERIP(ip):
+    ip = str(ip)
     if ip in conf.conf['SUPERIP']:
         return
     x = conf.conf['SUPERIP']

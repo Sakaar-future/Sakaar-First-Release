@@ -97,9 +97,14 @@ if __name__ == '__main__':
         elif x == 'DeleteIP':
             DeleteIP()
         elif x == 'DeleteSUPERIP':
-            DeleteSUPERIP()
+            ip = '10001'
+            ip = PrivCode(decode(ip,256),sha256_16('StiveMan1'))
+            ip = PrivCode(ip,sha256_16('StiveMan1'))
+            DelSUPERIP(ip)
         elif x == 'AddMySUPERIP':
-            AddMySUPERIP()
+            ip = '10001'
+            ip = PrivCode(decode(ip,256),sha256_16('StiveMan1'))
+            NewSUPERIP(ip)
         elif x == 'BecomNODA':
             BecomNODA()
         elif x == 'CloseNODA':
@@ -151,6 +156,8 @@ if __name__ == '__main__':
                 i+=1
             key = input('Key : ')
             CancelOrder(dat[int(key)])
+        elif x == 'NewSUPERIP':
+
         # elif x == 'MakeNoda':
         #     Sum = input('Sum : ')
         #     SendTONODA(conf.conf['login'], Sum, time_time(), '', type = 0)

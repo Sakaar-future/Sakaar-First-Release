@@ -87,11 +87,11 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['6baaf43cfcd0.ngrok.io']
-# conf.conf['SUPERIP'] = ['6baaf43cfcd0.ngrok.io']
+# conf.conf['Connected'] = ['3300945b1410.ngrok.io']
+# conf.conf['SUPERIP'] = ['3300945b1410.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['6baaf43cfcd0.ngrok.io']
+    conf.conf['Connected'] = ['3300945b1410.ngrok.io']
 if 'SUPERIP' not in conf.conf:
     conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:
@@ -606,7 +606,7 @@ def UpDate_R(dat):
         conf.conf['Version'] = dat['Version']
         GetUpDate()
         UpDate(dat['Version'])
-        # install('pyCryptoCorex')
+        install('pyCryptoCorex')
 
         sys.exit(82)
         # ReBorn()

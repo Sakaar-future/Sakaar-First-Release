@@ -11,7 +11,7 @@ from base64 import b64decode, b64encode
 from pyngrok import ngrok
 from flask_cors import CORS
 
-Version = '1.000'
+Version = '1.001'
 # b'A\xdeQ<\xdd*;\t\x1f\xe9Dy\xf07J\xb6'
 
 app = Flask(__name__)
@@ -87,11 +87,11 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['3a5b182bacbf.ngrok.io']
-# conf.conf['SUPERIP'] = ['3a5b182bacbf.ngrok.io']
+# conf.conf['Connected'] = ['6baaf43cfcd0.ngrok.io']
+# conf.conf['SUPERIP'] = ['6baaf43cfcd0.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['3a5b182bacbf.ngrok.io']
+    conf.conf['Connected'] = ['6baaf43cfcd0.ngrok.io']
 if 'SUPERIP' not in conf.conf:
     conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:
@@ -411,6 +411,8 @@ def Server_Proc():
 def Send_T1(dat,OUT = False,func = None): # Send to all
     if OUT == False:
         for ip in conf.conf['Connected']:
+            if ip == conf.conf['MyIP']:
+                continue
             try:
                 res = requests_post(f'http://{str(ip)}/', json = dat)
                 res = res.json()
@@ -445,7 +447,7 @@ def DeleteIP():
     if conf.conf['MyIP'] != None and conf.conf['MyIP'] in conf.conf['Connected']:
         DelIP(conf.conf['MyIP'])
 def AddMyIP():
-    if conf.conf['MyIP'] == None:
+    if conf.conf['MyIP'] is None:
         x = ngrok.connect(10101)
         conf.conf['MyIP'] = (str(x)[7:])
         # print('lol',str(x)[7:])
@@ -564,7 +566,6 @@ def GetUpDate():
         print (x[0])
         with open(x[0], 'wb') as f:
             f.write(b64decode(bytes(x[1],'utf-8')))
-    UpDate()
 def GetUpDate_S():
 
     return {'Protocol':'GetUpDate'}
@@ -583,6 +584,12 @@ def GetUpDate_R(dat):
     indir('web')
     with open('QRCode.py', 'rb') as input:
         dat['files'].append(['QRCode.py',str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
+    with open('setup.py', 'rb') as input:
+        dat['files'].append(['setup.py',str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
+    with open('Start.py', 'rb') as input:
+        dat['files'].append(['Start.py',str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
+    with open('Controler.py', 'rb') as input:
+        dat['files'].append(['Controler.py',str(b64encode(input.read()), 'utf-8',errors='ignore').strip()])
     Pass = None
     dat['files'] = sorted(dat['files'])
     with open('VerPass.skr', 'r') as f:
@@ -596,9 +603,11 @@ def UpDate_S(Ver):
     return {'Protocol':'UpDate','Version':Ver}
 def UpDate_R(dat):
     if dat['Version'] != conf.conf['Version']:
+        conf.conf['Version'] = dat['Version']
         GetUpDate()
         UpDate(dat['Version'])
-        install('pyCryptoCorex')
+        # install('pyCryptoCorex')
+
         sys.exit(82)
         # ReBorn()
 #done

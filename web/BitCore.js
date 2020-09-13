@@ -20,7 +20,7 @@ if (!('Connected' in conf)){
     conf['Connected'] = ['127.0.0.1:10101'];
 }
 if (!('SUPERIP' in conf)){
-    conf['SUPERIP'] = ['3a5b182bacbf.ngrok.io'];
+    conf['SUPERIP'] = ['6baaf43cfcd0.ngrok.io'];
 }
 if (!('OurWallets' in conf)){
     conf['OurWallets'] = [];

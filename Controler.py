@@ -105,7 +105,7 @@ if __name__ == '__main__':
             ip = '10001'
             ip = PrivCode(decode(ip,256),sha256_16('StiveMan1'))
             NewSUPERIP(ip)
-        elif x == 'BecomNODA':
+        elif x == 'BecomeNODA':
             BecomNODA()
         elif x == 'CloseNODA':
             CloseNODA()

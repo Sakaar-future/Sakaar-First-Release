@@ -87,11 +87,11 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['3300945b1410.ngrok.io']
-# conf.conf['SUPERIP'] = ['3300945b1410.ngrok.io']
+# conf.conf['Connected'] = ['457af3235c91.ngrok.io']
+# conf.conf['SUPERIP'] = ['457af3235c91.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['3300945b1410.ngrok.io']
+    conf.conf['Connected'] = ['457af3235c91.ngrok.io']
 if 'SUPERIP' not in conf.conf:
     conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:
@@ -302,50 +302,52 @@ def lol(f):
     get_conf()
     dat = None
     try:
-        dat = g.dat
+        try:
+            dat = g.dat
+        except Exception as e:
+            pass
+        if dat is None:
+            return f
+        if dat['Protocol'] == 'SendTranzh':
+            SendTranzh_R(dat)
+        elif dat['Protocol'] == 'SendTONODA':
+            SendTONODA_R(dat)
+        elif dat['Protocol'] == 'ResTranzh':
+            ResTranzh_R(dat)
+        elif dat['Protocol'] == 'CreateAccountS':
+            CreateAccountS_R(dat)
+        elif dat['Protocol'] == 'ConACC':
+            ConACC_R(dat)
+        elif dat['Protocol'] == 'ANConACC':
+            ANConACC_R(dat)
+        elif dat['Protocol'] == 'Activate':
+            Activate_R(dat)
+        elif dat['Protocol'] == 'DelIP':
+            DelIP_R(dat)
+        elif dat['Protocol'] == 'NewIP':
+            NewIP_R(dat)
+        elif dat['Protocol'] == 'DisActivate':
+            DisActivate_R(dat)
+        elif dat['Protocol'] == 'ChangeVoiting':
+            ChangeVoiting_R(dat)
+        elif dat['Protocol'] == 'VoteFor':
+            VoteFor_R(dat)
+        elif dat['Protocol'] == 'UpDate':
+            UpDate_R(dat)
+        elif dat['Protocol'] == 'SendOrder':
+            SendOrder_R(dat)
+        elif dat['Protocol'] == 'AddWallet':
+            AddWallet_R(dat)
+        elif dat['Protocol'] == 'CancelOrder':
+            CancelOrder_R(dat)
+        elif dat['Protocol'] == 'NewSUPERIP':
+            NewSUPERIP_R(dat)
+        elif dat['Protocol'] == 'DelSUPERIP':
+            DelSUPERIP_R(dat)
+        elif dat['Protocol'] == 'AddWalletOUT':
+            AddWalletOUT_R(dat)
     except Exception as e:
         pass
-    if dat is None:
-        return f
-    if dat['Protocol'] == 'SendTranzh':
-        SendTranzh_R(dat)
-    elif dat['Protocol'] == 'SendTONODA':
-        SendTONODA_R(dat)
-    elif dat['Protocol'] == 'ResTranzh':
-        ResTranzh_R(dat)
-    elif dat['Protocol'] == 'CreateAccountS':
-        CreateAccountS_R(dat)
-    elif dat['Protocol'] == 'ConACC':
-        ConACC_R(dat)
-    elif dat['Protocol'] == 'ANConACC':
-        ANConACC_R(dat)
-    elif dat['Protocol'] == 'Activate':
-        Activate_R(dat)
-    elif dat['Protocol'] == 'DelIP':
-        DelIP_R(dat)
-    elif dat['Protocol'] == 'NewIP':
-        NewIP_R(dat)
-    elif dat['Protocol'] == 'DisActivate':
-        DisActivate_R(dat)
-    elif dat['Protocol'] == 'ChangeVoiting':
-        ChangeVoiting_R(dat)
-    elif dat['Protocol'] == 'VoteFor':
-        VoteFor_R(dat)
-    elif dat['Protocol'] == 'UpDate':
-        UpDate_R(dat)
-    elif dat['Protocol'] == 'SendOrder':
-        SendOrder_R(dat)
-    elif dat['Protocol'] == 'AddWallet':
-        AddWallet_R(dat)
-    elif dat['Protocol'] == 'CancelOrder':
-        CancelOrder_R(dat)
-    elif dat['Protocol'] == 'NewSUPERIP':
-        NewSUPERIP_R(dat)
-    elif dat['Protocol'] == 'DelSUPERIP':
-        DelSUPERIP_R(dat)
-    elif dat['Protocol'] == 'AddWalletOUT':
-        AddWalletOUT_R(dat)
-
     return f
 
 @app.route("/",methods = ['GET'])
@@ -354,59 +356,62 @@ def lol():
 
 @app.route("/",methods = ['POST'])
 def Server_Proc():
-    g.dat = dat = json.loads(request.data.decode())
-    get_conf()
     res = None
-    if dat is None:
-        return jsonify(res)
+    try:
+        g.dat = dat = json.loads(request.data.decode())
+        get_conf()
+        if dat is None:
+            return jsonify(res)
 
-    print(dat['Protocol'])
-    if dat['Protocol'] == 'Registr':
-        Registr_R(dat)#
-    elif dat['Protocol'] == 'getAOrder':
-        res = getAOrder_R(dat)#
-    elif dat['Protocol'] == 'getHOrder':
-        res = getHOrder_R(dat)#
-    elif dat['Protocol'] == 'get_User':
-        res = get_User_R(dat)#
-    elif dat['Protocol'] == 'GetUnUsedAddress':
-        res = GetUnUsedAddress_R(dat)#
-    elif dat['Protocol'] == 'Login':
-        res = Login_R(dat)#
-    elif dat['Protocol'] == 'get_UserOF':
-        res = get_UserOF_R(dat)#
-    elif dat['Protocol'] == 'IsServer':
-        res = IsServer_R(dat)#
-    elif dat['Protocol'] == 'UpdateVoiting':
-        res = UpdateVoiting_R(dat)
-    elif dat['Protocol'] == 'GetConf':
-        res = GetConf_R(dat)#
-    elif dat['Protocol'] == 'GetUpDate':
-        res = GetUpDate_R(dat)#
-    elif dat['Protocol'] == 'CheckVer':
-        res = CheckVer_R(dat)
-    elif dat['Protocol'] == 'GetAllData':
-        res = GetAllData_R(dat)#
-    elif dat['Protocol'] == 'RegistrOUT':
-        res = RegistrOUT_R(dat)
-    elif dat['Protocol'] == 'get_Order':
-        res = get_Order_R(dat)#
-    elif dat['Protocol'] == 'getBalanceOUT':
-        res = getBalanceOUT_R(dat)
-    elif dat['Protocol'] == 'SendOUT_P':
-        res = SendOUT_P_R(dat)
-    elif dat['Protocol'] == 'GetDataToSendOUT':
-        res = GetDataToSendOUT_R(dat)
-    elif dat['Protocol'] == 'getBalance':
-        res = getBalance_R(dat)#
-    elif dat['Protocol'] == 'getATran':
-        res = getATran_R(dat)#
-    elif dat['Protocol'] == 'getHTran':
-        res = getHTran_R(dat)#
-    elif dat['Protocol'] == 'GetPricesF':
-        res = GetPricesF_R(dat)#
-    elif dat['Protocol'] == 'getDataForGraf':
-        res = getDataForGraf_R(dat)#
+        print(dat['Protocol'])
+        if dat['Protocol'] == 'Registr':
+            Registr_R(dat)#
+        elif dat['Protocol'] == 'getAOrder':
+            res = getAOrder_R(dat)#
+        elif dat['Protocol'] == 'getHOrder':
+            res = getHOrder_R(dat)#
+        elif dat['Protocol'] == 'get_User':
+            res = get_User_R(dat)#
+        elif dat['Protocol'] == 'GetUnUsedAddress':
+            res = GetUnUsedAddress_R(dat)#
+        elif dat['Protocol'] == 'Login':
+            res = Login_R(dat)#
+        elif dat['Protocol'] == 'get_UserOF':
+            res = get_UserOF_R(dat)#
+        elif dat['Protocol'] == 'IsServer':
+            res = IsServer_R(dat)#
+        elif dat['Protocol'] == 'UpdateVoiting':
+            res = UpdateVoiting_R(dat)
+        elif dat['Protocol'] == 'GetConf':
+            res = GetConf_R(dat)#
+        elif dat['Protocol'] == 'GetUpDate':
+            res = GetUpDate_R(dat)#
+        elif dat['Protocol'] == 'CheckVer':
+            res = CheckVer_R(dat)
+        elif dat['Protocol'] == 'GetAllData':
+            res = GetAllData_R(dat)#
+        elif dat['Protocol'] == 'RegistrOUT':
+            res = RegistrOUT_R(dat)
+        elif dat['Protocol'] == 'get_Order':
+            res = get_Order_R(dat)#
+        elif dat['Protocol'] == 'getBalanceOUT':
+            res = getBalanceOUT_R(dat)
+        elif dat['Protocol'] == 'SendOUT_P':
+            res = SendOUT_P_R(dat)
+        elif dat['Protocol'] == 'GetDataToSendOUT':
+            res = GetDataToSendOUT_R(dat)
+        elif dat['Protocol'] == 'getBalance':
+            res = getBalance_R(dat)#
+        elif dat['Protocol'] == 'getATran':
+            res = getATran_R(dat)#
+        elif dat['Protocol'] == 'getHTran':
+            res = getHTran_R(dat)#
+        elif dat['Protocol'] == 'GetPricesF':
+            res = GetPricesF_R(dat)#
+        elif dat['Protocol'] == 'getDataForGraf':
+            res = getDataForGraf_R(dat)#
+    except Exception as e:
+        pass
     return jsonify(res)
 def Send_T1(dat,OUT = False,func = None): # Send to all
     if OUT == False:
@@ -442,7 +447,7 @@ def Start():
     if conf.conf['isRunning']:
         BecomNODA()
 
-#done
+
 def DeleteIP():
     if conf.conf['MyIP'] != None and conf.conf['MyIP'] in conf.conf['Connected']:
         DelIP(conf.conf['MyIP'])
@@ -456,7 +461,7 @@ def AddMyIP():
         NewIP(conf.conf['MyIP'])
 
 
-#done
+
 def BecomNODA():
     if get_User(get_UserOF(conf.conf['login'])['Balance'] ['SKR'][0][0], 'SKR')['Freez']>= 1000:
 
@@ -473,12 +478,12 @@ def BecomNODA():
         conf.conf['isRunning'] = True
         conf.conf['isServer'] = True
         Activate(conf.conf['login'])
-#done
+
 def CloseNODA():
     DeleteIP()
     DisActivate(conf.conf['login'])
     conf.conf['isRunning'] = False
-#done
+
 def LogOut():
     conf.conf['login']          = ''
     conf.conf['passw']          = ''
@@ -535,7 +540,7 @@ def install(package):
         pip.main(['install', package])
     else:
         pip._internal.main(['install', package])
-#
+
 def CheckVer():
     if Send_T1(CheckVer_S()) != conf.conf['Version']:
         GetUpDate()
@@ -645,7 +650,7 @@ def GetConf_R(dat):
 
 
 
-
+#done
 def VoteFor(key,Address = None,Pass = None):
     if Pass == None and conf.conf['In']:
         Address = conf.conf['login']
@@ -721,17 +726,8 @@ def GetAllData_R(dat):
     return dat
 
 
-# def MakeOrder(Wal1, Sum1, Wal2, Sum2):
-#     if conf.conf['In']:
-
-#         Stk = Order(conf.conf['login'], Wal1, Sum1, Wal2, Sum2, conf.conf['passw'], time_time())
-#         Send_T1(SendOrder_S(Stk))
 
 
-
-
-
-#done
 def CancelOrder(stk,Pass = None):
     if Pass == None and conf.conf['In'] and conf.conf['login'] == get_User(stk['Address1'],stk['Wallet1'])['AddressTo']:
         Pass = PrivCode(decode(str(stk),256),conf.conf['PrivKey'])
@@ -760,7 +756,7 @@ def CancelOrder_S(stk,Pass):
 def CancelOrder_R(dat):
 
     CancelOrder(dat['Stk'],dat['Pass'])
-#done
+
 def MakeOrder(Adr1, Wal1, Sum1, Adr2, Wal2, k):
     if conf.conf['In']:
         # print ('MakeOrder')
@@ -788,6 +784,7 @@ def MakeOrder(Adr1, Wal1, Sum1, Adr2, Wal2, k):
                             res = 0
                             break
                         tor = 1
+                        print(mas[T['Wal']][T['PubKey1']])
                         stk = User.getFunc(mas[T['Wal']][T['PubKey1']])
                 if not T['PubKey2'] in mas[T['Wal']]:
                     mas[T['Wal']][T['PubKey2'] ] = get_User(PubToAdr(T['PubKey2'] ), T['Wal'])
@@ -819,12 +816,13 @@ def MakeOrder(Adr1, Wal1, Sum1, Adr2, Wal2, k):
             # print ('OLOLO', row, Adr2)
             # print('SUMM', SUM1, SUM2)
 
-            TS = [[PrivToPub(row['priv']), AdrToPub(Adr2), Wal2, SUM2, row['priv'], ''], [AdrToPub(Adr1), AdrToPub(row['Address2']), Wal1, SUM1, Priv, '']]
+            TS = [[PrivToPub(row['priv']), AdrToPub(Adr2), Wal2, SUM2, row['priv'], ''],
+                [AdrToPub(Adr1), AdrToPub(row['Address2']), Wal1, SUM1, Priv, '']]
             TS = PreSendTranzh(TS)
-            print ('NOOOOO', COOL(TS))
-            if COOL(TS):
-                Sum1 -= SUM1
-                SendTranzh(Tranzhs.Create(TS))
+            # print ('NOOOOO', COOL(TS))
+            # if COOL(TS):
+            Sum1 -= SUM1
+            SendTranzh(Tranzhs.Create(TS))
 
         # print (Sum1)
         if(Sum1 > 0):
@@ -850,7 +848,7 @@ def MakeOrder(Adr1, Wal1, Sum1, Adr2, Wal2, k):
             # print (get_User(PubToAdr(PubKey), Wal1)['Balance'] )
             # print
             Send_T1(SendOrder_S(Stk))
-#done
+
 def Func(mas, TS, stk):
     lol = len(TS)== 1 and mas[TS[0]['Wal']][TS[0]['PubKey1'] ]['AddressTo']== mas[TS[0]['Wal']][TS[0]['PubKey2'] ]['AddressTo']
     # print (len(TS)== 2, mas[TS[0]['PubKey1'] ]['AddressTo'], mas[TS[1]['PubKey2'] ]['AddressTo'], stk, stk['Wallet1']== TS[0]['Wal'], stk['Wallet2']== TS[1]['Wal'], TS[0]['Sum'] / TS[1]['Sum']== stk['k'], mas[TS[0]['PubKey1'] ]['Address']== stk['Address1'])
@@ -879,7 +877,7 @@ def SendOrder_S(Stk):
 def SendOrder_R(dat):
 
     SendOrder(dat['Stk'])
-#done
+
 def get_Order(Wallet1,Wallet2,k = 0):
     if conf.conf['isServer']:
         conn = sql3connect('Sakaar/exmp1.db')
@@ -1082,7 +1080,7 @@ def ConACC_S(Address, Wallet, AddressTo, PrivKey):
 def ConACC_R(dat):
 
     ConACC(dat['Address'], dat['Wallet'], dat['AddressTo'], dat['PrivKey'])
-#done
+
 def DelIP(ip):
     if not ip in conf.conf['Connected']:
         return
@@ -1097,7 +1095,7 @@ def DelIP_S(ip):
 def DelIP_R(dat):
 
     DelIP(dat['IP'])
-#done
+
 def NewIP(ip):
     if ip in conf.conf['Connected']:
         return
@@ -1113,7 +1111,7 @@ def NewIP_S(ip):
 def NewIP_R(dat):
 
     NewIP(dat['IP'])
-
+#done
 def SaveTranzhs(Tranzh):
     mas = {}
     res = 1
@@ -1215,7 +1213,7 @@ def SaveTranzhs(Tranzh):
     conn.commit()
     c.close()
     conn.close()
-
+#done
 def EndTranzh(Tranzh, res):
     print ('EndTranzh ' + str(res))
 
@@ -1241,7 +1239,7 @@ def EndTranzh(Tranzh, res):
             return
 
         SaveTranzhs(Tranzh)
-#done
+
 def Activate(Address):
     if conf.conf['isServer']:
         print(IsServer(Address))
@@ -1265,7 +1263,7 @@ def Activate_S(Address):
 def Activate_R(dat):
 
     Activate(dat['Address'])
-#done
+
 def DisActivate(Address):
     if conf.conf['isServer']:
         if 1 != IsServer(Address):
@@ -1327,7 +1325,7 @@ def ResTranzh_S(Address, Tranzh, res,Pass):
 def ResTranzh_R(dat):
 
     ResTranzh(dat['Address'], Tranzhs.FromJSON(dat['Tranzh']), dat['res'],dat['Pass'])
-
+#done
 def Checker(T, kke1, kke2):
     Pass = sha256_16(str(T['PubKey1'] ) + str(T['PubKey2'] ) + T['Wal'] + str(T['Sum']) + kke1['Hash'] + kke2['Hash'] + str(T['time']))
     res1 = 1
@@ -1344,7 +1342,7 @@ def Checker(T, kke1, kke2):
     print ('Checker', T['Comis']>=conf.conf['Comis'] , User.Check(kke1, Pass, T['Pass']) , sha256_16(kke1['Hash'] + Pass)== T['Hash1'] , sha256_16(kke2['Hash'] + Pass)== T['Hash2'] , T['Sum'] > 0,T['Sum'])
     print ('Checker', res1,tor)
     return tor and res1
-
+#done
 def CheckerTranzh():
     i = 0
     while i < len(conf.conf['InMemory']):
@@ -1401,7 +1399,7 @@ def CheckerTranzh():
             return
 
         i += 1
-
+#done
 def SendTONODA(Address, Sum, t = None, Pass = None):
     Sum = float(Sum)
     if Pass == None and conf.conf['In'] and conf.conf['login'] == Address:
@@ -1488,6 +1486,13 @@ def PreSendTranzh(lol):
             Comis = T[7]
         else:
             Comis = conf.conf['Comis']
+        print(str(T[0]))
+        print(str(T[1]))
+        print(T[2])
+        print(str(T[3]))
+        print(mas[T[2]][T[0]]['Hash'])
+        print(mas[T[2]][T[1]]['Hash'])
+        print(str(t))
         Pass                  = str(T[0]) + str(T[1]) + T[2] + str(T[3]) + mas[T[2]][T[0]]['Hash'] + mas[T[2]][T[1]]['Hash'] + str(t)
         Pass                  = sha256_16(Pass)
         T1                      = Tranzh.Create(T[0], T[1], T[2], T[3], sha256_16(mas[T[2]][T[0]]['Hash'] + Pass), sha256_16(mas[T[2]][T[1]]['Hash'] + Pass), Pass, t, PubCode(decode(T[5], 256), T[1]), PubCode(decode(T[5], 256), T[0]), Comis)
@@ -1654,7 +1659,7 @@ def RegistrOUT_S(Wallet, AddressTo):
 def RegistrOUT_R(dat):
 
     return RegistrOUT(dat['Wallet'], dat['AddressTo'])
-
+#done
 def DelSUPERIP(ip):
     if not str(PubCode(int(ip),AdrToPub(conf.conf['Key']))) in conf.conf['SUPERIP']:
         return
@@ -1669,7 +1674,7 @@ def DelSUPERIP_S(ip):
 def DelSUPERIP_R(dat):
 
     DelSUPERIP(dat['IP'])
-
+#done
 def NewSUPERIP(ip):
     ip = str(ip)
     if ip in conf.conf['SUPERIP']:
@@ -1806,7 +1811,7 @@ def getBalance_S(Wallet, Address):
 def getBalance_R(dat):
 
     return getBalance(dat['Wallet'], dat['Address'])
-#done
+
 def getATran(Wal, Address):#exteranl Address
     if conf.conf['isServer']:
         conn = sql3connect('Sakaar/exmp1.db')
@@ -1819,7 +1824,7 @@ def getATran_S(Wallet, Address):
 def getATran_R(dat):
 
     return getATran(dat['Wallet'], dat['Address'])
-#done
+
 def getHTran(Wal, Address,Adr2 = None,t = None):#exteranl Address
     if conf.conf['isServer']:
         conn = sql3connect('Sakaar/exmp1.db')
@@ -1840,7 +1845,7 @@ def getHTran_S(Wallet, Address):
     return {'Protocol':'getHTran','Wallet':Wallet,'Address':Address}
 def getHTran_R(dat):
     return getHTran(dat['Wallet'], dat['Address'])
-#done
+
 def getAOrder(Wal, Address):#exteranl Address
     if conf.conf['isServer']:
         conn = sql3connect('Sakaar/exmp1.db')
@@ -1885,7 +1890,7 @@ def getDataForGraf_S(Wallet1, Wallet2,Time,lastTime):
     return {'Protocol':'getDataForGraf','Wallet1':Wallet1,'Wallet2':Wallet2,'Time':Time,'lastTime':lastTime}
 def getDataForGraf_R(dat):
     return getDataForGraf(dat['Wallet1'], dat['Wallet2'],dat['Time'],dat['lastTime'])
-#done
+
 def GetPricesF(Wallet1,data):#exteranl Address
     if conf.conf['isServer']:
         conn = sql3connect('Sakaar/exmp1.db')

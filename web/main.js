@@ -23,7 +23,7 @@ let Wallet ={
 	'Decred : DCR':'DCR',
 	'Ravencoin : RVN':'RVN',
 	'DigiByte : DGB':'DGB',
-	'PortBitX : PBX':'PBX',
+	'PortBitX : SKR':'SKR',
 	'SKR':'SKR'
 };
 var WalletsPrice ={};

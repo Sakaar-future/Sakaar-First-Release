@@ -38,14 +38,8 @@ def get_code_string(base):
         return systems[base]
     else:
         raise ValueError("Invalid base!")
-def generate_keys(bits = 1024):
-    private_key = RSA.generate(bits)
-    public_key = private_key.publickey()
-    # importKey
-    return private_key , public_key
 def sha256_16(arc):
     return hashlib.sha256(str(arc).encode()).hexdigest()
-
 def generate_Private(password,bits = 1024): #class type
     salt = sha256_16(password)     # replace with random salt if you can store one
     master_key = PBKDF2(password, salt, count=10000)  # bigger count = better
@@ -60,9 +54,6 @@ def get_Public(private_key): # class type
     return private_key.publickey()
 def get_string(key, format = 'PEM'):
     return key.exportKey(format).decode()
-
-def get_Private(arc):
-    return get_string(generate_Private(arc))
 def PrivToPub(password):
     priv = generate_Private(password)
     lol = get_string(get_Public(priv))
@@ -77,22 +68,15 @@ def AdrToPub(Adress):
     public_key = RSA.importKey(Adress)
     Public = get_string(public_key)
     return Public
-
-
-
 def PubCode(message, public_key):
     message = int(message)
     public_key = str(public_key)
     public_key = RSA.importKey(public_key.encode())
     # return public_key.encrypt(message)
     return int(public_key.encrypt(message))
-
 def PrivCode(ciphertext, private_key):
     ciphertext = int(ciphertext)
     private_key = generate_Private(private_key)
     ciphertext = str ( ciphertext)
     # return private_key.decrypt(ciphertext)
     return int(private_key.decrypt(ciphertext))
-Key = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='
-print(PrivToPub(sha256_16('StiveMan1')) == AdrToPub(Key))
-# print(encode(PrivCode(PubCode(decode('hello',256),PrivToPub('lol')),'lol'),256))

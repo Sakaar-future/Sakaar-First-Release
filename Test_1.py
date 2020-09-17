@@ -47,11 +47,11 @@ def Test_3():
     MakeOrder(kke1['Balance']['SKR1'][0][0],'SKR1',2000,kke1['Balance']['SKR2'][0][0],'SKR2',1)
     time_sleep(3)
 
-    # LogOut()
-    # Login(Login2,Password2)
-    # time_sleep(3)
-    # kke1 = get_UserOF(Login2)
-    # MakeOrder(kke1['Balance']['SKR2'][0][0],'SKR2',2000,kke1['Balance']['SKR1'][0][0],'SKR1',1)
+    LogOut()
+    Login(Login2,Password2)
+    time_sleep(3)
+    kke1 = get_UserOF(Login2)
+    MakeOrder(kke1['Balance']['SKR2'][0][0],'SKR2',2000,kke1['Balance']['SKR1'][0][0],'SKR1',1)
 
     time_sleep(6)
     print(Login1)
@@ -70,7 +70,7 @@ def Test_3():
     print()
 # getHOrder('0rnxLgMiv0',"SKR1");
 print ('Tset_1',Test_1())
-print ('Tset_2',Test_2())
+# print ('Tset_2',Test_2())
 print ('Tset_3',Test_3())
 #Order Remove Test
 

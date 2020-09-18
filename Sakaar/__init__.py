@@ -87,11 +87,11 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['457af3235c91.ngrok.io']
-# conf.conf['SUPERIP'] = ['457af3235c91.ngrok.io']
+# conf.conf['Connected'] = ['7e7acc4ef300.ngrok.io']
+# conf.conf['SUPERIP'] = ['7e7acc4ef300.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['457af3235c91.ngrok.io']
+    conf.conf['Connected'] = ['7e7acc4ef300.ngrok.io']
 if 'SUPERIP' not in conf.conf:
     conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:

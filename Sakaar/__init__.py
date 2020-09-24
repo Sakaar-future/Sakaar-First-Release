@@ -87,11 +87,11 @@ def get_conf():
         conf.conf = shelve_open('conf')
     return conf
 get_conf()
-# conf.conf['Connected'] = ['7e7acc4ef300.ngrok.io']
-# conf.conf['SUPERIP'] = ['7e7acc4ef300.ngrok.io']
+# conf.conf['Connected'] = ['0866932dbdbd.ngrok.io']
+# conf.conf['SUPERIP'] = ['0866932dbdbd.ngrok.io']
 conf.conf['MyIP'] = None
 if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = ['7e7acc4ef300.ngrok.io']
+    conf.conf['Connected'] = ['0866932dbdbd.ngrok.io']
 if 'SUPERIP' not in conf.conf:
     conf.conf['SUPERIP'] = []
 if 'OurWallets' not in conf.conf:
@@ -553,9 +553,8 @@ def CheckVer_R(dat):
 #done
 def GetUpDate():
     def function(Data):
-        Pass = Data['Pass']
         Data['Data']['files'] = sorted(Data['Data']['files'])
-        if decode(sha256_16(Data['Data']),16) == PubCode(int(Pass),AdrToPub(conf.conf['Key'])):
+        if decode(sha256_16(sha256_16(Data['Data'])+Data['Version']),16) == PubCode(int(Data['Pass']),AdrToPub(conf.conf['Key'])) and Data['Version'] != Version:
             return Data
         return None
     dat = Send_T1(GetUpDate_S(),func = function)
@@ -599,7 +598,8 @@ def GetUpDate_R(dat):
     dat['files'] = sorted(dat['files'])
     with open('VerPass.skr', 'r') as f:
         Pass = int(f.read())
-    return {'Data':dat,'Pass': Pass}
+    print(Version)
+    return {'Data':dat,'Pass': Pass,"Version":Version}
 
 def UpDate(Ver):
     Send_T1(UpDate_S(Ver))

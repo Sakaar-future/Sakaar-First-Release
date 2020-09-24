@@ -162,3 +162,5 @@ if __name__ == '__main__':
         #     Sum = input('Sum : ')
         #     SendTONODA(conf.conf['login'], Sum, time_time(), '', type = 0)
             lol = ''
+        elif x == 'exit':
+            sys.exit()

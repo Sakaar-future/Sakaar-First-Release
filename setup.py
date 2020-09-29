@@ -74,7 +74,7 @@ def second_stage():
     conf['Connected'] = ['8a698b655b2c.ngrok.io']
     conf['Version'] = '1.000'
     conf['OurWallets'] = ['BTC','SKR']
-    conf['Key'] = 'AAAAgQCkuqxx8XsVCOn0+Z3EFogneSuTOXRFsbRIACp8mLiXsv2v44Aa/uCFFpSPvleT/hIkJob+88StiMRQRtmHkbqeN1POfpNO1rPxJT1JONhHISns301hGN5k8ixQIdUiLduP0c7eewwfd1gyMScL+9YlBopQEb18BpzF0tjP+lWOdQ=='
+    conf['Key'] = 'AAAAgGJ7QgqWpm/wWvKxUpRNoPXeTjsskUWXgWQxSkXj0OSd7GfmPAcDUy+LJXRPCEH/ID0yWRLthz5KNIniPQ3pcGOk8lrifdYpUsUtQ3TEb7uOzGd7ArBHAvnY1BVcUIOzO8EsdgiRpTAhI1JA86zPHYeT8M2L6fhU6HxhQ8Lpu0J3'
 
     def Send_T1(dat,OUT = False,func = None): # Send to all
         if OUT == False:
@@ -104,6 +104,9 @@ def second_stage():
     def GetUpDate():
         def function(Data):
             Data['Data']['files'] = sorted(Data['Data']['files'])
+            print(PubCode(int(Data['Pass']),AdrToPub(conf['Key'])))
+            print()
+            print(decode(sha256_16(sha256_16(Data['Data'])+Data['Version']),16))
             if decode(sha256_16(sha256_16(Data['Data'])+Data['Version']),16) == PubCode(int(Data['Pass']),AdrToPub(conf['Key'])):
                 return Data
             return None

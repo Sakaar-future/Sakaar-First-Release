@@ -42,12 +42,23 @@ def sha256_16(arc):
     return hashlib.sha256(str(arc).encode()).hexdigest()
 def generate_Private(password,bits = 1024): #class type
     salt = sha256_16(password)     # replace with random salt if you can store one
-    master_key = PBKDF2(password, salt, count=10000)  # bigger count = better
-    # print(master_key)
+    master_key = sha256_16(password+salt)  # bigger count = better
+
     def my_rand(n):
         my_rand.counter += 1
-        return PBKDF2(master_key, "my_rand:%d" % my_rand.counter, dkLen=n, count=1)
+        x = b''
+        y = ""
+        while(len(x)<n):
+            y = sha256_16(y[32::]+master_key+str(my_rand.counter))
+            j = 0
+            while(j<len(y) and len(x)<n):
+                k = decode(y[j]+y[j+1],'16')
+                x += bytes(k.to_bytes((k.bit_length() + 7) // 8, 'big'))
+                j+=2;
+        return x[:n]
+        # return PBKDF2(master_key, "my_rand:%d" % my_rand.counter, dkLen=n, count=1)
     my_rand.counter = 0
+
     RSA_key = RSA.generate(bits, randfunc=my_rand)
     return RSA_key
 def get_Public(private_key): # class type

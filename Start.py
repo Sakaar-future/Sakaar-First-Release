@@ -1,5 +1,5 @@
 import subprocess
-import pip
+import pip,shelve
 conf = None
 def install(package):
     if hasattr(pip, 'main'):
@@ -16,7 +16,7 @@ def get_conf():
     return conf
 get_conf()
 while code == 82:
-    if conf['Version'] is None:
+    if 'Version' not in conf:
         pass
     else:
         install("Sakaar=="+conf['Version'])

@@ -14,12 +14,15 @@ def get_conf():
     if conf is None:
         conf = shelve.open('conf')
     return conf
-get_conf()
+
 while code == 82:
+    get_conf()
     if 'Version' not in conf:
         pass
     else:
+        get_conf()
         install("Sakaar=="+conf['Version'])
+    conf.close()
     try:
         process = subprocess.Popen(['python',"Controler.py"])
         process.wait()

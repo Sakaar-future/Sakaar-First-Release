@@ -20,18 +20,20 @@ while code == 82:
     if 'Version' not in conf:
         pass
     else:
-        get_conf()
         install("Sakaar=="+conf['Version'])
+    conf['ExitCode'] = 1
     conf.close()
     try:
         process = subprocess.Popen(['python',"Controler.py"])
         process.wait()
-        code = process.returncode
     except Exception as e:
         pass
     try:
         process = subprocess.Popen(['python3',"Controler.py"])
         process.wait()
-        code = process.returncode
     except Exception as e:
         pass
+
+    get_conf()
+    code = conf['ExitCode']
+    conf.close()

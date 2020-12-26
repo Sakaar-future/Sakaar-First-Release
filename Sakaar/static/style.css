@@ -1,0 +1,632 @@
+/*@font-face {
+    font-family: 'Baloo 2', cursive;
+}*/
+@supports(scroll-snap-type: both mandatory) {
+ .no-support {
+    display: none;
+ }
+}
+::-webkit-scrollbar { /* chrome based */
+    width: 0px; /* ширина scrollbar'a */
+    background: transparent; /* опционально */
+}
+html { overflow: hidden; }
+html {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.el_table{
+    display:inline-block;
+    word-break: break-word;
+    margin:5px 10px;
+}
+.nav_container{
+    /*opacity: 0.2;*/
+    height: 100%;
+    width: 200px;
+    left: 0;
+    top: 0;
+    margin: 0;
+    position: absolute;
+    transition: 300ms linear;
+    /*position: fixed;*/
+    /*overflow: hidden;*/
+    overflow: scroll;
+    -ms-overflow-style: none;
+    background: #ee6620;
+    /*overflow: auto ;*/
+}
+.top_nav{
+    left: 0;
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 60px;
+    background: #333;
+    /*overflow: auto ;*/
+}
+.nav_main{
+    left: 0;
+    top: 0;
+    margin: 0;
+    width: 100%;
+    height: 60px;
+    background: #333;
+    /*overflow: auto ;*/
+}
+.user_logo{
+    margin-top: 5px;
+    margin-left: 7px;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    border-radius: 30px;
+    align-content: center;
+    background: yellow;
+}
+.user_logo_1{
+    margin-top: 2px;
+    /*background-color:#654321;
+    opacity: 0.5;*/
+    font-family: 'Baloo 2', cursive;
+    font-size: 30px;
+    text-align: center;
+}
+.user_name{
+    /*margin-top: 5px;*/
+    color: #fff;
+    position: absolute;
+    margin-left: 70px;
+    margin-top: 15px;
+    font-size: 20px;
+
+}
+hr {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    border-radius: 7px 7px 7px 7px;
+}
+#nav_list{
+    left:0;
+    top:0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+#display{
+    margin: 0;
+    right: 15px;
+    position: absolute;
+    top: 15px;
+    width: 200px;
+    min-height: 120px;
+    max-height: 80%;
+    opacity: 1.0;
+    border-radius: 10px;
+    transition:300ms linear;
+    background-color: #ee6620;
+    overflow: hidden;
+}
+.Chat_Label {
+    font-weight: 700;
+    position: absolute;
+    margin-top: 2px;
+    left: 10px;
+    width: 125px;
+    word-break: unset;
+    overflow: hidden;
+    height: 24px;
+}
+.Chat_Time {
+    margin-top: 2px;
+    right: 10px;
+    position: absolute;
+}
+.Chat_Text {
+    margin-top: 25px;
+    left: 10px;
+    width: 147px;
+    position: absolute;
+    word-break: unset;
+    overflow: hidden;
+    height: 24px;
+}
+.Chat_Notion {
+    margin-top: 25px;
+    right: 10px;
+    position: absolute;
+    border-radius: 15px;
+    padding: 0px 5px;
+    background-color: red;
+}
+.Chat_Label#Name_Chat_Wallet{
+    width: 147px;
+    height: 51px;
+}
+.Chat_Label#Big_Chat {
+    width: 400px;
+}
+.Chat_Text#Big_Chat {
+    width: 400px;
+}
+
+.main{
+    background-color: #999;
+    left: 265px;
+    right: 0px;
+    height: 102%;
+    top: 0;
+    margin: 0;
+    transition: 300ms linear;
+    position: absolute;
+
+    overflow: scroll;
+    -ms-overflow-style: none;
+}
+.Chat_Date {
+    padding: 5px;
+}
+.Chat_Date_Content {
+    padding: 3px 10px;
+    border-radius: 15px;
+    background-color: #555;
+    display: inline-block;
+    font-size: 13.9px;
+}
+#main_t_l{
+    background: #777;
+    position: absolute;
+    left: 7px;
+    right: 222px;
+    top: 7px;
+    bottom: 0;
+    border-radius: 10px;
+    overflow: scroll;
+}
+#main_1{
+    background-color: #999;
+    left: 200px;
+    width: 200px;
+    height: 100%;
+    top: 0;
+    margin: 0;
+    transition: 300ms linear;
+    position: absolute;
+}
+.nav_element {
+    vertical-align: middle;
+    top: 0;
+    margin-right: 2px;
+    margin-left: 2px;
+    min-height: 55px;
+    background: #444;
+    word-break: break-word;
+    border-radius: 5px;
+}
+.nav_element_Choosen {
+    vertical-align: middle;
+    top: 0;
+    margin-right: 2px;
+    margin-left: 2px;
+    min-height: 55px;
+    background: #666;
+    word-break: break-word;
+    border-radius: 5px;
+}
+.nav_element_chat{
+    top: 0;
+    margin-right: 2px;
+    margin-left: 2px;
+    background: #444;
+    word-break: break-word;
+    border-radius: 5px;
+}
+
+.display_new{
+    right: 25px;
+    position: absolute;
+    display:inline-block;
+}
+.display_container{
+    opacity: 0.0;
+    overflow: scroll;
+    -ms-overflow-style: none;
+    background-color: #555;
+    position: absolute;
+    transition:300ms linear;
+    height: 100%;
+    width: 100%;
+}
+.forGrafC{
+    width: 70%;
+    height: 70%;
+    position: absolute;
+}
+.display_el{
+    height: 20px;
+    margin: 0;
+    width: 90%;
+    margin-top: 2px;
+    transition:300ms linear;
+    background-color: #ee6620;
+    border-radius: 5px;
+}
+#content_bar{
+    position: absolute;
+    top: 120px;
+    left: 5px;
+    right: 5px;
+    bottom: 15px;
+}
+.display_tx{
+    display:inline-block;
+    position: absolute;
+    left:25px;
+}
+.send_input{
+    height: 25px;
+    border-radius: 10px;
+    font-size: 15px;
+    width: 180px;
+    background-color: #fff;
+}
+.OrderQueue{
+
+}
+#upper_navbar{
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 50px;
+    background-color: #555;
+}
+.filter{
+    opacity: 0.75;
+    background-color: #000;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    display: none;
+}
+.window{
+    background-color: #777;
+    position: absolute;
+
+    right: 15%;
+    left: 15%;
+    bottom: 15%;
+    top:10%;
+    border-radius: 10px;
+    display: none;
+}
+.body_wind{
+
+    background-color: #999;
+    position: absolute;
+
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: 70px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+
+
+    overflow: scroll;
+    -ms-overflow-style: none;
+
+}
+
+.search{
+    display: block;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    height: 40px;
+    border-radius: 15px;
+    font-size: 20px;
+    background-color: #fff;
+}
+#SendOrdaer {
+    margin-top: 55px;
+    border-radius: 5px;
+    background-color: #ee6620;
+    padding: 10px;
+    position: absolute;
+    top: 70%;
+    width: 70%;
+}
+#Chat_Window{
+    background: #777;
+    position: absolute;
+    min-width: 200px;
+    left: 7px;
+    right: 222px;
+    top: 7px;
+    bottom: 0;
+    border-radius: 10px;
+}
+#main_t{
+    height: 100%;
+    width: 100%;
+}
+#Chat_Up_Bar{
+    background-color: #555;
+    position: absolute;
+    top: 0;
+    height: 50px;
+    left: 0;
+    right: 0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+#Chat_SKR{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+#Chat_SKR_l{
+    top: 50px;
+    overflow: scroll;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+#Chat_Back{
+    position: absolute;
+    display: inline-block;
+    top: 15px;
+    left: 15px;
+}
+.Msg_Text{
+    word-break: break-word;
+    display: inline-block;
+}
+.Msg_Block{
+    text-align: right;
+}
+.Msg_Time{
+    font-size: 12px;
+    display: inline-block;
+    margin-right: 10px;
+}
+.Msg_Sum{
+    font-size: 13px;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.Msg_Cont{
+    margin: 2px;
+}
+.Msg_Cont#out{
+    background: #447;
+    border-radius: 7px;
+    /* padding-top: 0.2px; */
+    margin: 2px 20px;
+    display: inline-block;
+    max-width: 500px;
+    padding: 3px 10px;
+}
+.Msg_Cont#in{
+    background: #444;
+    border-radius: 7px;
+    /* padding-top: 0.2px; */
+    margin: 2px 20px;
+    display: inline-block;
+    max-width: 500px;
+    padding: 3px 10px;
+}
+input.Send{
+    height: 25px;
+    border-radius: 10px;
+    font-size: 15px;
+    width: 100%;
+    background-color: #fff;
+}
+div.Send{
+    position: absolute;
+    background-color: #666;
+    height: 40px;
+    width: 100%;
+    bottom: 0;
+    border-radius: 10px;
+}
+div.Send_Msg{
+    position: absolute;
+    top: 5px;
+    right: 135px;
+    left: 5px;
+}
+div.Send_Sum{
+    position: absolute;
+    top: 5px;
+    right: 75px;
+    width: 50px;
+}
+div{
+    /* font-family: 'Open Sans', sans-serif; */
+        font-family: 'Baloo 2', cursive;
+}
+input.Send_Btn{
+    height: 30px;
+    width: 60px;
+    right: 5px;
+    top: 5px;
+    border-radius: 10px;
+    font-size: 15px;
+    background-color: #fff;
+    position: absolute;
+}
+#filter_none_clicable {
+    display: block;
+}
+.Registr_form {
+    background-color: #777;
+    position: relative;
+    left: -50%;
+    height: 100%;
+    width: 350px;
+    border-radius: 10px;
+    /* display: none; */
+}
+.Registr_form_Head {
+    position: absolute;
+    margin: 15px;
+    font-size: 23px;
+    font-weight: 700;
+    left: 15%;
+    right: 15%;
+    text-align: center;
+    background: #999;
+    border-radius: 15px;
+}
+.Registr_form_Body {
+    position: absolute;
+    top: 70px;
+    bottom: 5%;
+    right: 10%;
+    left: 10%;
+    background: #999;
+}
+
+
+
+url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+* {
+	font-family: "Roboto";
+}
+
+:root {
+	--omrs-color-ink-lowest-contrast: rgba(47, 60, 85, 0.18);
+	--omrs-color-ink-low-contrast: rgba(60, 60, 67, 0.3);
+	--omrs-color-ink-medium-contrast: rgba(19, 19, 21, 0.6);
+	--omrs-color-interaction: #1e4bd1;
+	/* --omrs-color-interaction-minus-two: rgba(73, 133, 224, 0.12); */
+	--omrs-color-danger: #b50706;
+	--omrs-color-bg-low-contrast: #eff1f2;
+	--omrs-color-ink-high-contrast: #121212;
+	--omrs-color-bg-high-contrast: #ffffff;
+
+}
+
+/* Input*/
+.omrs-input-underlined > input,
+.omrs-input-filled > input {
+	border: none;
+	border-bottom: 0.125rem solid var(--omrs-color-ink-medium-contrast);
+	width: 99%;
+	height: 2rem;
+	font-size: 1.0625rem;
+	line-height: 147.6%;
+	padding-top: 0.825rem;
+	padding-bottom: 0.5rem;
+}
+
+.omrs-input-underlined > input:focus,
+.omrs-input-filled > input:focus {
+	outline: none;
+}
+
+.omrs-input-underlined > .omrs-input-label,
+.omrs-input-filled > .omrs-input-label {
+	position: absolute;
+	top: 0.9375rem;
+	left: 0.875rem;
+	line-height: 147.6%;
+	color: var(--omrs-color-ink-medium-contrast);
+	transition: top .2s;
+}
+
+.omrs-input-underlined > svg,
+.omrs-input-filled > svg {
+	position: absolute;
+	top: 0.9375rem;
+	right: 0.875rem;
+	fill: var(--omrs-color-ink-medium-contrast);
+}
+
+.omrs-input-underlined > .omrs-input-helper,
+.omrs-input-filled > .omrs-input-helper {
+	font-size: 0.9375rem;
+	color: var(--omrs-color-ink-medium-contrast);
+	letter-spacing: 0.0275rem;
+	margin: 0.125rem 0.875rem;
+}
+
+.omrs-input-underlined > input:hover,
+.omrs-input-filled > input:hover {
+	background: var(--omrs-color-interaction-minus-two);
+	border-color: var(--omrs-color-ink-high-contrast);
+}
+
+.omrs-input-underlined > input:focus + .omrs-input-label,
+.omrs-input-underlined > input:valid + .omrs-input-label,
+.omrs-input-filled > input:focus + .omrs-input-label,
+.omrs-input-filled > input:valid + .omrs-input-label {
+	top: 0;
+	font-size: 0.9375rem;
+	margin-bottom: 32px;;
+}
+
+.omrs-input-underlined:not(.omrs-input-danger) > input:focus + .omrs-input-label,
+.omrs-input-filled:not(.omrs-input-danger) > input:focus + .omrs-input-label {
+	color: var(--omrs-color-interaction);
+}
+
+.omrs-input-underlined:not(.omrs-input-danger) > input:focus,
+.omrs-input-filled:not(.omrs-input-danger) > input:focus {
+	border-color: var(--omrs-color-interaction);
+}
+
+.omrs-input-underlined:not(.omrs-input-danger) > input:focus ~ svg,
+.omrs-input-filled:not(.omrs-input-danger) > input:focus ~ svg {
+	fill: var(--omrs-color-ink-high-contrast);
+}
+
+/** DISABLED **/
+
+.omrs-input-underlined > input:disabled {
+	background: var(--omrs-color-bg-low-contrast);
+	cursor: not-allowed;
+}
+
+.omrs-input-underlined > input:disabled + .omrs-input-label,
+.omrs-input-underlined > input:disabled ~ .omrs-input-helper{
+	color: var(--omrs-color-ink-low-contrast);
+}
+
+.omrs-input-underlined > input:disabled ~ svg {
+	fill: var(--omrs-color-ink-low-contrast);
+}
+
+
+/** DANGER **/
+
+.omrs-input-underlined.omrs-input-danger > .omrs-input-label, .omrs-input-underlined.omrs-input-danger > .omrs-input-helper,
+.omrs-input-filled.omrs-input-danger > .omrs-input-label, .omrs-input-filled.omrs-input-danger > .omrs-input-helper{
+	color: var(--omrs-color-danger);
+}
+
+.omrs-input-danger > svg {
+	fill: var(--omrs-color-danger);
+}
+
+.omrs-input-danger > input {
+	border-color: var(--omrs-color-danger);
+}
+
+.omrs-input-underlined > input {
+	background: var(--omrs-color-bg-high-contrast);
+}
+.omrs-input-filled > input {
+	background: var(--omrs-color-bg-low-contrast);
+}

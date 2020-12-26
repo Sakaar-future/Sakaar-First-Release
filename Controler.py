@@ -38,8 +38,14 @@ if __name__ == '__main__':
             x = get_UserOF(conf.conf['login'])['Balance']
             for Wal in x:
                 print(Wal)
+                list = []
                 for kke in x[Wal]:
-                    print (kke[0],get_User(kke[0],Wal)['Balance'])
+                    list.append(kke[0])
+                dat = getBalance_list(Wal,list)
+                i= 0
+                for kke in x[Wal]:
+                    print (kke[0],dat[i])
+                    i+=1
         elif x == 'BalanceOF':
             logi = input('Login : ')
             x = get_UserOF(logi)['Balance']
@@ -91,7 +97,10 @@ if __name__ == '__main__':
                         dat = getHTran(Wal,kke[0])
                         priv = encode(PrivCode(kke[1], conf.conf['PrivKey'] ), 16)
                         for i in dat:
-                            print (get_User(PubToAdr(i[1]),Wal)['AddressTo'],encode(PrivCode(i[9], priv), 256),i[6])
+                            if(i[1] == conf.conf['PubKey']):
+                                print ("From" , get_User(PubToAdr(i[1]),Wal)['AddressTo'],encode(PrivCode(i[10], priv), 256),i[6])
+                            else:
+                                print ("TO" , get_User(PubToAdr(i[2]),Wal)['AddressTo'],encode(PrivCode(i[11], priv), 256),i[6])
         elif x == 'AddMyIP':
             AddMyIP()
         elif x == 'DeleteIP':
@@ -128,6 +137,10 @@ if __name__ == '__main__':
             print(conf.conf['Voiting'][key])
             VoteFor(key)
         elif x == 'ChangeVoiting':
+            title = input('Title : ')
+            title = PrivCode(decode(str(json.dumps(title)),256),sha256_16('StiveMan1'))
+            Description = input("Description : ")
+            Description = PrivCode(decode(str(json.dumps(Description)),256),sha256_16('StiveMan1'))
             num = int(input('Num : '))
             dat = {}
             key = 0
@@ -137,7 +150,9 @@ if __name__ == '__main__':
                 dat[str(key)][1] = input('Statment : ')
                 key  += 1
             print(dat)
-            ChangeVoiting(dat)
+            dat = PrivCode(decode(str(json.dumps(dat)),256),sha256_16('StiveMan1'))
+
+            ChangeVoiting(dat,title,Description)
         elif x == 'getAOrder':
             Wal =         input('Wallet  : ')
             Address =     input('Address : ')
@@ -163,4 +178,5 @@ if __name__ == '__main__':
         #     SendTONODA(conf.conf['login'], Sum, time_time(), '', type = 0)
             lol = ''
         elif x == 'exit':
-            sys._exit()
+            conf.conf['ExitCode'] = 10
+            os._exit()

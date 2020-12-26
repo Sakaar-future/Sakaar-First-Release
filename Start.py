@@ -6,7 +6,7 @@ def install(package):
         pip.main(['install', package])
     else:
         pip._internal.main(['install', package])
-code = 82 # restart
+code = 81 # restart
 def get_conf():
     # pass
     global conf
@@ -15,14 +15,15 @@ def get_conf():
         conf = shelve.open('conf')
     return conf
 
-while code == 82:
-    get_conf()
-    if 'Version' not in conf:
-        pass
-    else:
-        install("Sakaar=="+conf['Version'])
-    conf['ExitCode'] = 1
-    conf.close()
+while code == 82 or code == 81:
+    if code == 82:
+        get_conf()
+        if 'Version' not in conf:
+            pass
+        else:
+            install("Sakaar=="+conf['Version'])
+        conf['ExitCode'] = 1
+        conf.close()
     try:
         process = subprocess.Popen(['python',"Controler.py"])
         process.wait()
@@ -35,5 +36,8 @@ while code == 82:
         pass
 
     get_conf()
-    code = conf['ExitCode']
+    try:
+        code = conf['ExitCode']
+    except:
+        pass
     conf.close()

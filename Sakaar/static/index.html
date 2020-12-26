@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Baloo+2&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link href= "style.css" rel="stylesheet">
+
+
+</head>
+
+<body class="body">
+    <div onmouseenter="normalnav()" class = "main" id="main">
+        <div id="main" style="margin: 0;">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="600" height="70">
+        <polyline points="5, 5 5, 20, 150, 20, 150, 35, 295, 35, 295, 50, 440, 50 440, 65"
+                 stroke="#b4241b" stroke-width="3" fill="none" />
+
+    </svg> -->
+        </div>
+    </div>
+    <div onmouseenter="normalnav()" id="main_1">
+        <div class="nav_container" id="nav_menu">
+            <div id="nav_menu_l">
+                <!-- <div class="nav_element">
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <div id="display" align="center">
+        <div id='content_bar'>
+            <div class="display_container" id="orde_n"></div>
+            <div class="display_container" id="mess_n"></div>
+            <div class="display_container" id="trac_n"></div>
+            <div class="display_container" id="send_n">
+                <div>Wallet</div>
+                <input type="text" id = "send_Wall" class="send_input">
+                <div>AdresFrom</div>
+                <input type="text" id = "send_From" class="send_input">
+                <div>AdresTo</div>
+                <input type="text" id = "send_To" class="send_input">
+                <div>Sum</div>
+                <input type="text" id = "send_Sum" class="send_input">
+                <div>Msg</div>
+                <textarea id = "send_Msg" rows="8" class="send_input" style = "height : 130px;"></textarea>
+                <input type="button" class="send_input" value="Send" onclick = "SNEW_Send()">
+            </div>
+        </div>
+        <div class="display_el" style="margin-top: 15px;" onclick="SNEW('orde_n', 'orde_b')" id="orde_b">
+            <div class="display_tx">Orders</div>
+            <div class="display_new" id="orde_new">+10</div>
+        </div>
+
+        <div class="display_el" onclick="SNEW('mess_n', 'mess_b')" id="mess_b">
+            <div class="display_tx">Messages</div>
+            <div class="display_new" id="mess_new">+5</div>
+        </div>
+
+        <div class="display_el" onclick="SNEW('trac_n', 'trac_b')" id="trac_b">
+            <div class="display_tx"> Trackers</div>
+            <div class="display_new" id="trac_new">+1</div>
+        </div>
+        <div class="display_el" style="margin-bottom: 15px;" onclick="SNEW('send_n', 'send_b')" id="send_b">
+            <div class="display_tx">Sending</div>
+        </div>
+
+        <hr align="center" width="75%" size="3" color="purple">
+    </div>
+    <div class="nav_container" onmouseenter="bignav()" id="nav_wal">
+        <div class="nav_main" onclick="onAccount()">
+            <div class="user_logo">
+                <div class="user_logo_1" id="short_username">
+                    US
+                </div>
+            </div>
+            <div class="user_name" id="user_name">User Name
+            </div>
+        </div>
+        <div id="nav_wal_l">
+            <hr align="center" width="75%" size="3" color="purple">
+            <div class="nav_element" align="center" onclick="World()">Search
+            </div>
+            <hr align="center" width="75%" size="3" color="purple">
+            <div class="nav_element" align="center" onclick="AddWallet()">Add Wallet
+            </div>
+            <!-- <div class="nav_element">
+            </div> -->
+        </div>
+    </div>
+    <div class="filter" id = "filter" onclick="HideWindow()"></div>
+    <div class="filter" id="filter_none_clicable"></div>
+    <div class="window" id="window">
+        <div style="width : 100%;height : 55px;"><input class="search" id="search"></input></div><div class="body_wind" id ="body_wind"><div    id ="body_wind_l"></div></div>
+    </div>
+    <div style="position: absolute; left: 50%;top: 20%; bottom:40%">
+        <div class="Registr_form" id="Registr_form">
+            <div class="Registr_form_Head">Login or Registr</div>
+            <div class="Registr_form_Body">
+                <div>
+                    <div style="position: absolute;width: 100%;">
+                        <div class="omrs-input-group">
+                        	<label class="omrs-input-underlined">
+                                <input required="" id="UserName_R">
+                                <span class="omrs-input-label">User Name</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div style="position: absolute;top: 70px;width: 100%;">
+                        <div class="omrs-input-group">
+                        	<label class="omrs-input-underlined">
+                                <input required="" id="Password_R">
+                                <span class="omrs-input-label">Password</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="Registr_btn" style="
+                        width: 100px;
+                        height: 35px;
+                        background: #666;
+                        position: absolute;
+                        top: 160px;
+                        margin-left: 15px;
+                        padding-top: 10px;
+                        /* padding-left: 10px; */
+                        text-align: center;
+                    " onclick="Registr_M()">Registr
+                    </div>
+                    <div id="Login_btn" style="
+                        width: 100px;
+                        height: 35px;
+                        background: #666;
+                        position: absolute;
+                        top: 160px;
+                        margin-left: 165px;
+                        padding-top: 10px;
+                        /* padding-left: 10px; */
+                        text-align: center;
+                    " onclick="Login_M()">Login
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script type="text/javascript" src="BitCore_json.js"></script>
+<script type="text/javascript" src="js-sha256.js"></script>
+<script type="text/javascript" src="BitCore.js"></script>
+<script type="text/javascript" src="main.js"></script>
+</html>

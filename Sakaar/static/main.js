@@ -337,7 +337,6 @@ async function onAccount(){
 //done
 async function getMyWallets(){
 	user = await get_UserOF(conf['login']);
-	tr = "";
 	for (var Wallet in user['Balance']){
 		list = [];
 		for (let Address of user['Balance'][Wallet]){
@@ -345,9 +344,12 @@ async function getMyWallets(){
 		}
 		dat = await getBalance_list(Wallet,list);
 		i =0;
+		Wallet_ = String(Wallet)
+		var sum = 0;
+		tr = '<div class="ALL_Wallet_Adresses" id="ALL_' + Wallet_ + '">';
 		for (let Address of user['Balance'][Wallet]){
-			Wallet_ = String(Wallet)
 			Address_ = String(Address[0])
+			sum+=parseFloat(dat[i]);
 			tr += '<div>';
 			tr += '<div class="el_table" onclick = "onWallet(\''+Wallet_ +'\')" id ="' + Wallet_+ '">' + Wallet_ + '</div>';
 			tr += '<div class="el_table" onclick = "showWallet(\''+Wallet_+'\', \'' + Address_ +'\')">' + String(dat[i]) + '</div>';
@@ -358,8 +360,22 @@ async function getMyWallets(){
 			tr += '<hr align="center" size="3" width="75%" color="purple">';
 			i ++;
 		}
+		tr += "</div";
+		document.getElementById('main_t').innerHTML +='<div class="ALL_Wallet"  onclick = "Hide_Wallets(\'ALL_'+Wallet_ +'\')"><div class="ALL_Wallet_Name">' + Wallet_ + '</div><div class="ALL_Wallet_Sum">' + sum + '</div></div>';
+		document.getElementById('main_t').innerHTML += tr;
+
+		document.getElementById('ALL_'+Wallet_).style.opacity = 0;
+		document.getElementById('ALL_'+Wallet_).style.height = "0px";
 	}
-	document.getElementById('main_t').innerHTML += tr;
+}
+function Hide_Wallets(Wallet){
+	if(document.getElementById(Wallet).style.opacity != 0.0){
+		document.getElementById(Wallet).style.opacity = 0;
+		document.getElementById(Wallet).style.height = "0px";
+	}else{
+		document.getElementById(Wallet).style.opacity = 1;
+		document.getElementById(Wallet).style.height = "auto";
+	}
 }
 async function MyWallets(){
 	SDisplay();
@@ -449,8 +465,7 @@ function setLogin(name){
 		name += '...';
 	}
 	document.getElementById("user_name").innerHTML = name;
-	name = name.toUpperCase();
-	document.getElementById("short_username").innerHTML = name[0] + name[1];
+	document.getElementById("user_logo").src = "http://127.0.0.1:10101/user_logo/"+name;
 }
 
 function setWallet(name){
@@ -895,7 +910,7 @@ async function Chat_0(){
 	const myNode = document.getElementById("Chat_SKR");
 	myNode.innerHTML = '';
 	index =Chat_data[Chat_Wallet];
-	for (let Adr of index['Order'].slice(0, 100)){
+	for (let Adr of index['Order']){
 		myNode.appendChild(createLinear());
 		var item = createItem();
 		item.onclick = async function (){
@@ -1374,9 +1389,33 @@ class Graf {
 	}
 	// calcArea();
 }
+
+
+
 async function Update_data_Chat(lastTime,now){
 	for(var Wallet of Wallets_We_have){
 		dat = await getHTran(Wallet,conf['login'],Update_lastTime,0);
+		dat_to_priv = [];
+		for(var msg of dat){
+			if(msg[6] > now){
+				continue;
+			}
+			var kek = Chat_data[Wallet];
+			if(msg[1] in kek){
+				kek = kek[msg[1]];
+				dat_to_priv.push([msg[11],kek['PrivKey']])
+
+
+			}else if(msg[2] in kek){
+				kek = kek[msg[2]];
+
+				dat_to_priv.push([msg[10],kek['PrivKey']])
+
+			}
+		}
+
+		dat_to_priv = await PrivCode_list(dat_to_priv);
+
 		for(var msg of dat){
 			if(msg[6] > now){
 				continue;
@@ -1398,7 +1437,7 @@ async function Update_data_Chat(lastTime,now){
 				  kek['Order'].splice(index, 1);
 				}
 				kek['Order'].unshift(msg[2]);
-				var msg_text = await encode(await PrivCode(msg[11], kek['PrivKey']), 256)
+				var msg_text = await encode(dat_to_priv[msg[11]+ kek['PrivKey']], 256)
 				kek['From'][msg[2]]['Msgs'].push([msg_text,msg[3],msg[6],false,msg[0]]);
 				if(Wallet == Chat_Wallet && Chat_Open_Adr == msg[1] && Chat_Open_From == msg[2] && Page_Type == "Chat_2"){
 					kek['From'][msg[2]]['Last'] ++;
@@ -1427,8 +1466,7 @@ async function Update_data_Chat(lastTime,now){
 				  kek['Order'].splice(index, 1);
 				}
 				kek['Order'].unshift(msg[1]);
-
-				var msg_text = await encode(await PrivCode(msg[10], kek['PrivKey']), 256)
+				var msg_text = await encode(dat_to_priv[msg[10]+ kek['PrivKey']], 256)
 				kek['From'][msg[1]]['Msgs'].push([msg_text,msg[3],msg[6],true,msg[0]]);
 
 				if(Wallet == Chat_Wallet && Chat_Open_Adr == msg[2] && Chat_Open_From == msg[1] && Page_Type == "Chat_2"){
@@ -1443,6 +1481,7 @@ async function Update_data_Chat(lastTime,now){
 			}
 		}
 	}
+	print(Chat_data)
 	if(Page_Type == "Chat_1"){
 		Chat_1()
 	}else if(Page_Type == "Chat_0"){

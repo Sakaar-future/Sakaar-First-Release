@@ -59,6 +59,7 @@ html {
     margin-left: 7px;
     width: 50px;
     height: 50px;
+    overflow: hidden;
     position: absolute;
     border-radius: 30px;
     align-content: center;
@@ -629,4 +630,24 @@ url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
 }
 .omrs-input-filled > input {
 	background: var(--omrs-color-bg-low-contrast);
+}
+
+.ALL_Wallet {
+    background: #666;
+    width: 100%;
+    height: 55px;
+}
+.ALL_Wallet_Name {
+    font-size: 23px;
+    padding-top: 10px;
+    padding-left: 15px;
+    display: inline-block;
+}
+.ALL_Wallet_Sum {
+    display: inline-block;
+    float: right;
+    margin: 15px;
+}
+.ALL_Wallet_Adresses {
+    margin: 0px 15px;
 }

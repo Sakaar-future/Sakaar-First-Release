@@ -10,6 +10,9 @@ function DisActivate_S(Address){
 function ResTranzh_S(Address, Tranzh, res,Pass){
     return {'Protocol':'ResTranzh','Address':Address,'Tranzh':Tranzhs.ToJSON(Tranzh),'res':res,'Pass':Pass};
 }
+function PrivCode_list_S(dat){
+    return {'Protocol':'PrivCode_list','Data':dat};
+}
 function SendTONODA_S(Address, Sum, time, Pass){
     return {'Protocol':'SendTONODA','Address':Address,'Sum':Sum,'Time':time,'Pass':Pass};
 }

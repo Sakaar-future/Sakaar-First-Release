@@ -1,22 +1,22 @@
-from threading import Thread
-from Sakaar.Crypto import *
-import os, json, io
-from time import time as time_time, sleep as time_sleep
-from random import randint
 from sqlite3 import connect as sql3connect
 from shelve import open as shelve_open
+import json
+from threading import Thread
+import os
+from time import time as time_time, sleep as time_sleep
+from random import randint
 from requests import post as requests_post
-from flask import Flask, g, request, jsonify, make_response, render_template, send_file
+from flask import Flask, g, request, jsonify, render_template
 from base64 import b64decode, b64encode
-from pyngrok import ngrok
 from flask_cors import CORS
-import Sakaar.WebNet
+from .R_type import *
+from .S_type import *
+from .V_type import *
+from .Crypto import *
+from .C_type import *
 
 Path = os.path.dirname(__file__)
 Version = '1.0.31'
-
-app = Flask(__name__)
-CORS(app)
 
 
 def Generator(size):
@@ -43,7 +43,8 @@ def DeleteIP_TCP():
     if conf.conf['MyIP_TCP'] != None and conf.conf['MyIP_TCP'] in conf.conf['Connected_TCP'] and conf.conf['MyIP_TCP'][
         2] == conf.conf['login']:
         DelIP_TCP(conf.conf['MyIP_TCP'], PrivCode(
-            decode(json.dumps(['DelIP', conf.conf['MyIP_TCP'][0], conf.conf['MyIP_TCP'][1], conf.conf['login']]), 256),
+            Crypto.decode(json.dumps(['DelIP', conf.conf['MyIP_TCP'][0], conf.conf['MyIP_TCP'][1], conf.conf['login']]),
+                          256),
             conf.conf['PrivKey']))
 
 
@@ -187,59 +188,6 @@ def Server_Ent():
     conf.conf['isRunning'] = True
     app.run(host='127.0.0.1', port=10101)
 
-
-@app.after_request
-def lol(f):
-    get_conf()
-    dat = None
-    try:
-        try:
-            dat = g.dat
-        except Exception as e:
-            pass
-        if dat is None:
-            return f
-        if dat['Protocol'] in Functions_R:
-            Functions_R[dat['Protocol']](dat)
-    except Exception as e:
-        print(e)
-    return f
-
-
-@app.route("/", methods=['GET'])
-def Main_program():
-    return render_template("index.html")
-
-
-@app.route("/", methods=['POST'])
-def Server_Proc():
-    res = None
-    try:
-        g.dat = dat = json.loads(request.data.decode())
-        get_conf()
-        if dat is None:
-            return jsonify(res)
-        print(dat['Protocol'])
-        if dat['Protocol'] in Functions_R_res:
-            res = Functions_R_res[dat['Protocol']](dat)
-    except Exception as e:
-        print(e)
-    return jsonify(res)
-
-@app.route('/user_logo/<login>')
-def show_user_profile(login):
-    src = 'avatar2.png'
-    conn = sql3connect(Path + '/exmp1.db')
-    c = conn.cursor()
-    dat = c.execute(
-        f''' SELECT Photo FROM UserOF WHERE Address = '{login}' ''').fetchall()[0][0]
-    conn.close()
-    if(dat != None):
-        dat = b64decode(encode(PubCode(decode(dat,256),get_UserOF(login)['PubKey']),256).encode('utf-8'))
-        return send_file(io.BytesIO(dat),attachment_filename='logo.png',
-                     mimetype='image/png')
-    # show the user profile for that user
-    return send_file(src)
 
 def Send_T1(dat, OUT=False, func=None):  # Send to all
     if OUT == False:
@@ -408,7 +356,7 @@ def CheckVer():
         dat = {'dirs': [], 'files': []}
 
         def indir(dirs, arc):
-            dat['dirs'].append(dirs[arc:])
+            dat['dirs'].append(dirs[arc])
             for file in os.listdir(dirs):
                 if os.path.isfile(dirs + '//' + file):
                     with open(dirs + '//' + file, 'rb') as input:
@@ -435,7 +383,7 @@ def UpDate(Ver):
 def GetConf():
     dat = Send_T1(GetConf_S())
     if dat is None:
-        raise "Error with connection"
+        raise Exception("Error with connection")
     dat = dat['Data']
     conf.conf['Version'] = dat[0]
     conf.conf['Connected'] = dat[1]
@@ -505,7 +453,7 @@ def UpdateVoiting():
 def GetAllData():
     dat = Send_T1(GetAllData_S())
     if dat is None:
-        raise "Error with connection"
+        raise Exception("Error with connection")
     for x in dat:
         with open(Path[:len(Path) - 6] + x, 'wb') as f:
             f.write(b64decode(bytes(dat[x], 'utf-8')))
@@ -577,10 +525,11 @@ def MakeOrder(Adr1, Wal1, Sum1, Adr2, Wal2, k):
                     mas[T['Wal']][T['PubKey2']] = get_User(PubToAdr(T['PubKey2']), T['Wal'])
                 res &= Checker(T, mas[T['Wal']][T['PubKey1']], mas[T['Wal']][T['PubKey2']])
                 mas[T['Wal']][T['PubKey1']]['Balance'] -= T['Sum']
-                if len(mas[T['Wal']][T['PubKey2'] ]['AddressTo'] ) > 0 and mas[T['Wal']][T['PubKey2'] ]['AddressTo']== mas[T['Wal']][T['PubKey1'] ]['AddressTo'] :
-                    mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum']
+                if len(mas[T['Wal']][T['PubKey2']]['AddressTo']) > 0 and mas[T['Wal']][T['PubKey2']]['AddressTo'] == \
+                        mas[T['Wal']][T['PubKey1']]['AddressTo']:
+                    mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum']
                 else:
-                    mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum'] *(1-T['Comis'])
+                    mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum'] * (1 - T['Comis'])
                 mas[T['Wal']][T['PubKey1']]['Hash'] = T['Hash1']
                 mas[T['Wal']][T['PubKey2']]['Hash'] = T['Hash2']
             res = res and (tor != 1 or Func(mas, TS, stk))
@@ -641,7 +590,7 @@ def Func(mas, TS, stk):
 def chOrder(a, b):
     [x['Address1'], x['Address2'], x['SumS'], x['k'], x['t'], x['priv']]
     return (a.Adr1 == b.Adr1) and (a.Adr2 == b.Adr2) and (a.t == b.t) and (a.Wal1 == b.Wal1) and (
-                a.Wal2 == b.Wal2) and (a.k == b.k)
+            a.Wal2 == b.Wal2) and (a.k == b.k)
 
 
 def SendOrder(stk):
@@ -758,9 +707,10 @@ def get_UserOF(Address):
         Address = str(Address)
         conn = sql3connect(Path + '/exmp1.db')
         c = conn.cursor()
-        dat = c.execute(f'''SELECT * FROM UserOF WHERE Address = '{Address}' ''').fetchone()
-        if not (dat is None):
-            kke = UserOF.FromSQL(dat)
+        c.execute(f'''SELECT Address FROM UserOF WHERE Address = '{Address}' ''')
+        if not (c.fetchone() is None):
+            kke = UserOF.FromSQL(c.execute(f'''SELECT * FROM UserOF WHERE Address = '{Address}' ''').fetchall()[0])
+            conn.commit()
         conn.close()
         return kke
     return Send_T1(get_UserOF_S(Address))
@@ -850,10 +800,11 @@ def SaveTranzhs(Tranzh):
         mas[T['Wal']][T['PubKey1']]['Balance'] -= T['Sum']
         # TranzhHistory(T)
         mas[T['Wal']][T['PubKey2']]['Hash'] = T['Hash2']
-        if len(mas[T['Wal']][T['PubKey2'] ]['AddressTo'] ) > 0 and mas[T['Wal']][T['PubKey2'] ]['AddressTo']== mas[T['Wal']][T['PubKey1'] ]['AddressTo'] :
-            mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum']
+        if len(mas[T['Wal']][T['PubKey2']]['AddressTo']) > 0 and mas[T['Wal']][T['PubKey2']]['AddressTo'] == \
+                mas[T['Wal']][T['PubKey1']]['AddressTo']:
+            mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum']
         else:
-            mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum'] *(1-T['Comis'])
+            mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum'] * (1 - T['Comis'])
     res = res and (tor != 1 or Func(mas, Tranzh['TS'], stk))
     conn = sql3connect(Path + '/exmp1.db')
     c = conn.cursor()
@@ -868,10 +819,11 @@ def SaveTranzhs(Tranzh):
             continue
         if Tranzh['AddressTo'] != None and conf.conf['isSUPER']:
             AddressFrom = get_User(PubToAdr(T['PubKey2']), T['Wal'])['AddressFrom']
-            T2 = Tranzh.Create(T['PubKey1'] , 'out/' + AddressTo, T['Wal'], T['Sum']*(1-T['Comis']), sha256_16(kek['Hash'] + Pass), T['PubKey2'] , '', time_time(), MesIn = '', MesOut = '')
+            T2 = Tranzh.Create(T['PubKey1'], 'out/' + AddressTo, T['Wal'], T['Sum'] * (1 - T['Comis']),
+                               sha256_16(kek['Hash'] + Pass), T['PubKey2'], '', time_time(), MesIn='', MesOut='')
             # TranzhHistoryP(PubToAdr(T['PubKey2'] ), T2['Wal'], T2)
             # TranzhHistory(T2)
-            SendOUT_P1(AddressFrom, Tranzh['AddressTo'] , T['Sum']*(1-T['Comis']), T['Wal'])
+            SendOUT_P1(AddressFrom, Tranzh['AddressTo'], T['Sum'] * (1 - T['Comis']), T['Wal'])
         ARRR = []
         T['Comision'] = []
         SumCom = T['Sum'] * T['Comis']
@@ -896,9 +848,10 @@ def SaveTranzhs(Tranzh):
                     mas[T['Wal']][Adr]['Hash'] = sha256_16(mas[T['Wal']][Adr]['Hash'] + Pass)
                     ARRR.append(kke['Address'])
         c.execute(f'''INSERT INTO History VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
-        conf.conf['Block'], PubToAdr(T['PubKey1']), PubToAdr(T['PubKey2']), T['Sum'], T['Comis'], T['Wal'], T['time'],
-        mas[T['Wal']][T['PubKey1']]['AddressTo'], mas[T['Wal']][T['PubKey2']]['AddressTo'], json.dumps(T['Comis']),
-        encode(int(T['MesIn']),256), encode(int(T['MesOut']),256)))
+            conf.conf['Block'], PubToAdr(T['PubKey1']), PubToAdr(T['PubKey2']), T['Sum'], T['Comis'], T['Wal'],
+            T['time'],
+            mas[T['Wal']][T['PubKey1']]['AddressTo'], mas[T['Wal']][T['PubKey2']]['AddressTo'], json.dumps(T['Comis']),
+            json.dumps(int(T['MesIn'])), json.dumps(int(T['MesOut']))))
         conn.commit()
     for wal in mas:
         for name in mas[wal]:
@@ -926,14 +879,14 @@ def SaveTranzhs(Tranzh):
                         f'''UPDATE Orders SET t1 = {row['t1']}, Sum1 = {row['Sum1']} WHERE Wallet1 = '{stk['Wallet1']}' AND Wallet2 = '{stk['Wallet2']}' AND Address1 = '{stk['Address1']}' AND AddressFrom = '{stk['AddressFrom']}' AND Address2 = '{stk['Address2']}' AND SumS = '{stk['SumS']}' AND k = '{stk['k']}' AND t = '{stk['t']}' AND priv = '{stk['priv']}' ''')
                     conn.commit()
                 c.execute(f'''INSERT INTO Orders_H VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', (
-                stk['k'], row['t1'], stk['Wallet1'], stk['Wallet2'], conf.conf['Block'],
-                mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey1']]['AddressTo'],
-                mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey2']]['AddressTo'], Tranzh['TS'][0]['Sum']))
+                    stk['k'], row['t1'], stk['Wallet1'], stk['Wallet2'], conf.conf['Block'],
+                    mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey1']]['AddressTo'],
+                    mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey2']]['AddressTo'], Tranzh['TS'][0]['Sum']))
                 conn.commit()
                 c.execute(f'''INSERT INTO Orders_H VALUES(?, ?, ?, ?, ?, ?, ?, ?)''', (
-                1 / stk['k'], row['t1'], stk['Wallet2'], stk['Wallet1'], conf.conf['Block'],
-                mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey2']]['AddressTo'],
-                mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey1']]['AddressTo'], Tranzh['TS'][1]['Sum']))
+                    1 / stk['k'], row['t1'], stk['Wallet2'], stk['Wallet1'], conf.conf['Block'],
+                    mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey2']]['AddressTo'],
+                    mas[Tranzh['TS'][0]['Wal']][Tranzh['TS'][0]['PubKey1']]['AddressTo'], Tranzh['TS'][1]['Sum']))
                 conn.commit()
             break
     conn.commit()
@@ -1043,7 +996,6 @@ def Checker(T, kke1, kke2):
     print('Checker')
     Pass = sha256_16(
         str(T['PubKey1']) + str(T['PubKey2']) + T['Wal'] + str(T['Sum']) + kke1['Hash'] + kke2['Hash'] + str(T['time']))
-    print(Pass)
     res1 = 1
     if (T['Wal'] in conf.conf['OurWallets']):
         # print(kke1['Balance'] - T['Sum']>=0), (kke2['Balance']>=0)
@@ -1054,7 +1006,8 @@ def Checker(T, kke1, kke2):
     else:
         # print ('NOOOOOOOOO', T['Wal'], conf.conf['OurWallets'])
         res1 = 0
-    tor = T['Comis'] >= conf.conf['Comis'] and User.Check(kke1, Pass, T['Pass']) and sha256_16(kke1['Hash'] + Pass) == T['Hash1'] and sha256_16(kke2['Hash'] + Pass) == T['Hash2'] and T['Sum'] > 0
+    tor = T['Comis'] >= conf.conf['Comis'] and User.Check(kke1, Pass, T['Pass']) and sha256_16(kke1['Hash'] + Pass) == \
+          T['Hash1'] and sha256_16(kke2['Hash'] + Pass) == T['Hash2'] and T['Sum'] > 0
     print('Checker', T['Comis'] >= conf.conf['Comis'], User.Check(kke1, Pass, T['Pass']),
           sha256_16(kke1['Hash'] + Pass) == T['Hash1'], sha256_16(kke2['Hash'] + Pass) == T['Hash2'], T['Sum'] > 0,
           T['Sum'])
@@ -1109,10 +1062,11 @@ def CheckerTranzh():
                 res &= Checker(T, mas[T['Wal']][T['PubKey1']], mas[T['Wal']][T['PubKey2']])
                 print(res)
                 mas[T['Wal']][T['PubKey1']]['Balance'] -= T['Sum']
-                if len(mas[T['Wal']][T['PubKey2'] ]['AddressTo'] ) > 0 and mas[T['Wal']][T['PubKey2'] ]['AddressTo']== mas[T['Wal']][T['PubKey1'] ]['AddressTo'] :
-                    mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum']
+                if len(mas[T['Wal']][T['PubKey2']]['AddressTo']) > 0 and mas[T['Wal']][T['PubKey2']]['AddressTo'] == \
+                        mas[T['Wal']][T['PubKey1']]['AddressTo']:
+                    mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum']
                 else:
-                    mas[T['Wal']][T['PubKey2'] ]['Balance'] += T['Sum'] *(1-T['Comis'])
+                    mas[T['Wal']][T['PubKey2']]['Balance'] += T['Sum'] * (1 - T['Comis'])
                 mas[T['Wal']][T['PubKey1']]['Hash'] = T['Hash1']
                 mas[T['Wal']][T['PubKey2']]['Hash'] = T['Hash2']
             if conf.conf['InMemory'][i]['AddressTo'] != None or conf.conf['InMemory'][i]['AddressHashed'] != None:
@@ -1215,15 +1169,12 @@ def PreSendTranzh(lol):
         print(str(t))
         Pass = str(T[0]) + str(T[1]) + T[2] + str(T[3]) + mas[T[2]][T[0]]['Hash'] + mas[T[2]][T[1]]['Hash'] + str(t)
         Pass = sha256_16(Pass)
-        print(Pass)
         T1 = Tranzh.Create(T[0], T[1], T[2], T[3], sha256_16(mas[T[2]][T[0]]['Hash'] + Pass),
                            sha256_16(mas[T[2]][T[1]]['Hash'] + Pass), Pass, t, PubCode(decode(T[5], 256), T[1]),
                            PubCode(decode(T[5], 256), T[0]), Comis)
         T1['Pass'] = PrivCode(decode(T1['Pass'], 256), T[4])
-        if len(mas[T[2]][T[1]]['AddressTo'] ) > 0 and mas[T[2]][T[1]]['AddressTo']== mas[T[2]][T[0]]['AddressTo'] :
-            mas[T[2]][T[1]]['Balance']      += T[3]
-        else:
-            mas[T[2]][T[1]]['Balance']      += T[3]*(1-Comis)
+        mas[T[2]][T[0]]['Balance'] -= T[3]
+        mas[T[2]][T[1]]['Balance'] += T[3] * (1 - Comis)
         mas[T[2]][T[0]]['Hash'] = T1['Hash1']
         mas[T[2]][T[1]]['Hash'] = T1['Hash2']
         TS.append(T1)
@@ -1251,8 +1202,8 @@ def SendTranzh(x):
         c = conn.cursor()
         for T in x['TS']:
             c.execute(f'''INSERT INTO ATran VALUES(?, ?, ?, ?, ?, ?, ?)''', (
-            PubToAdr(T['PubKey1']), PubToAdr(T['PubKey2']), T['Sum'], T['Comis'], T['Wal'], T['time'],
-            get_User(PubToAdr(T['PubKey1']), T['Wal'])['AddressTo']))
+                PubToAdr(T['PubKey1']), PubToAdr(T['PubKey2']), T['Sum'], T['Comis'], T['Wal'], T['time'],
+                get_User(PubToAdr(T['PubKey1']), T['Wal'])['AddressTo']))
             conn.commit()
         conn.close()
         tor = 1
@@ -1287,9 +1238,10 @@ def get_User(Address, Wallet):
         Wallet = str(Wallet)
         conn = sql3connect(Path + '/exmp1.db')
         c = conn.cursor()
-        dat = c.execute(f'''SELECT * FROM {Wallet} WHERE Address = '{Address}' ''').fetchone()
-        if not (dat is None):
-            kke = User.FromSQL(dat)
+        c.execute(f'''SELECT Address FROM {Wallet} WHERE Address = '{Address}' ''')
+        if not (c.fetchone() is None):
+            kke = User.FromSQL(c.execute(f'''SELECT * FROM {Wallet} WHERE Address = '{Address}' ''').fetchall()[0])
+            conn.commit()
             conn.close()
         else:
             conn.close()
@@ -1471,7 +1423,7 @@ def GetPricesF(Wallet1, data):  # exteranl Address
 def PrivCode_list(dat):
     res = {}
     for arc in dat:
-        res[str(arc[0]) + str(arc[1])] = PrivCode(decode(arc[0],256), arc[1])
+        res[arc[0] + arc[1]] = PrivCode(arc[0], arc[1])
     return res
 
 
@@ -1589,261 +1541,6 @@ def GetDataToSendOUT(Sum, Wal):
         conn.close()
         return dat
     return Send_T1(GetDataToSendOUT_S(Sum, Wal), OUT=True)
-
-
-conn = sql3connect(Path + '/exmp1.db')
-c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS UserOF(
-    Address         varchar(128)    NOT NULL,
-    PubKey          varchar(128)    NOT NULL,
-    Active          BOOL            NOT NULL,
-    Masseges        Text            NOT NULL,
-    Balance         Text            NOT NULL,
-    Time            Double          NOT NULL,
-    Photo            BLOB) ''')
-conn.commit()
-c.execute('''CREATE TABLE IF NOT EXISTS ATran(
-    PubKey1            varchar(128)    NOT NULL,
-    PubKey2            varchar(128)    NOT NULL,
-    Sum                Double          NOT NULL,
-    Comis              Double          NOT NULL,
-    Wallet             varchar(16)     NOT NULL,
-    Time               Double          NOT NULL,
-    AddressFrom        varchar(128)    NOT NULL)
-     ''')
-conn.commit()
-c.execute('''CREATE TABLE IF NOT EXISTS History(
-    Num             int             NOT NULL,
-    PubKey1         varchar(128)    NOT NULL,
-    PubKey2         varchar(128)    NOT NULL,
-    Sum             Double          NOT NULL,
-    Comis           Double          NOT NULL,
-    Wallet          varchar(16)     NOT NULL,
-    Time            Double          NOT NULL,
-    Address1        varchar(128)    NOT NULL,
-    Address2        varchar(128)    NOT NULL,
-    Comision        Text            NOT NULL,
-    MesInsageIn     Text,
-    MesInsageOut    Text
-    ) ''')
-conn.commit()
-c.execute('''CREATE TABLE IF NOT EXISTS Orders(
-    Address1        varchar(128)    NOT NULL,
-    Address2        varchar(128)    NOT NULL,
-    AddressFrom     varchar(128)    NOT NULL,
-    Wallet1         varchar(16)        NOT NULL,
-    Wallet2         varchar(16)        NOT NULL,
-    Sum1            Double            NOT NULL,
-    SumS            Double            NOT NULL,
-    k               Double            NOT NULL,
-    t               Double,
-    t1              Double,
-    priv            varchar(128)    NOT NULL) ''')
-conn.commit()
-c.execute('''CREATE TABLE IF NOT EXISTS Orders_H(
-    k                 Double            NOT NULL,
-    t                 Double            NOT NULL,
-    Wallet1           varchar(16)       NOT NULL,
-    Wallet2           varchar(16)       NOT NULL,
-    Num               int               NOT NULL,
-    AddressTo         varchar(128)      NOT NULL,
-    AddressFrom       varchar(128)      NOT NULL,
-    Sum               Double            NOT NULL
-) ''')
-conn.commit()
-conn.commit()
-# blobData = None
-# with open(Path + '\\unnamed.jpg', 'rb') as file:
-#     blobData = file.read()
-# print(blobData)
-# c.execute(f'''INSERT OR IGNORE INTO Users_Logo VALUES(?, ?)''',
-#           ('StiveMan1',blobData))
-# conn.commit()
-conn.close()
-
-
-class conf:
-    conf = None
-
-
-class User:
-    def Create(Address='', PubKey='', Wallet='', AddressTo='', FuncH='', Func='',
-               AddressFrom=''):  # AddressFrom - Other Wallets
-        if FuncH != '' and Func != '' and AddressTo != '' and PubCode(FuncH, get_UserOF(AddressTo)['PubKey']) == Func:
-            Func = FuncH
-        else:
-            Func = ''
-
-        conn = sql3connect(Path + '/exmp1.db')
-        c = conn.cursor()
-        c.execute(f'''CREATE TABLE IF NOT EXISTS {Wallet}(
-            Address         varchar(128)     NOT NULL,
-            AddressTo         varchar(128),
-            PubKey             varchar(128)     NOT NULL,
-            FuncH             varchar(128),
-            Func             varchar(128),
-            Time            Double,
-            Freez            Double            NOT NULL,
-            Balance            Double            NOT NULL,
-            Hash            varchar(128)    NOT NULL,
-            AddressFrom        varchar(128),
-            Wallet             varchar(16)     NOT NULL
-            ) ''')
-        conn.commit()
-        c.execute(f'''SELECT Address FROM {Wallet} WHERE Address = '{Address}' ''')
-        if c.fetchone() is None:
-            c.execute(f'''INSERT OR IGNORE INTO {Wallet} VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                      (Address, AddressTo, PubKey, str(FuncH), str(FuncH), 0, 0.0, 0.0, '', AddressFrom, Wallet))
-        conn.commit()
-        conn.close()
-
-    def FromSQL(x):
-        return {'Address': x[0], 'AddressTo': x[1], 'PubKey': x[2], 'FuncH': x[3], 'Func': x[4], 'Time': x[5],
-                'Freez': x[6], 'Balance': x[7], 'Hash': x[8], 'AddressFrom': x[9], 'Wallet': x[10]}
-
-    def ToSQL(x):
-        return [x['Address'], x['AddressTo'], x['PubKey'], x['FuncH'], x['Func'], x['Time'], x['Freez'], x['Balance'],
-                x['Hash'], x['AddressFrom'], x['Wallet']]
-
-    def Check(AC, a, RES):
-        a = decode(a, 256)
-        RES = PubCode(RES, AC['PubKey'])
-        return RES == a
-
-    def ChangeFunc(AC, FuncH, Func):
-        if (AC['AddressTo'] != ''):
-            PubKey = get_UserOF(AC['AddressTo'])['PubKey']
-            RES = PubCode(FuncH, PubKey)
-            if RES == Func:
-                conn = sql3connect(Path + '/exmp1.db')
-                c = conn.cursor()
-                c.execute(f'''UPDATE {AC['Wallet']} SET Func = '{FuncH}' WHERE Address = '{AC['Address']}' ''')
-                conn.commit()
-                conn.close()
-
-    def getFunc(AC):
-        if (AC['AddressTo'] != ''):
-            PubKey = get_UserOF(AC['AddressTo'])['PubKey']
-            return json.loads(encode(PubCode(AC['Func'], PubKey), 256))
-            # return encode(PubCode(self['Func'], PubKey), 256)
-
-    def CodeFunc(Func, PrivKey):
-        Func = json.dumps(Func)
-        Func1 = decode(Func, 256)
-        return PrivCode(Func1, PrivKey), Func1
-
-
-class Tranzh:
-    def Create(PubKey1, PubKey2, Wal, Sum, Hash1, Hash2, Pass, time, MesIn='', MesOut='', Comis=None):
-        x = {
-            'PubKey1': PubKey1,
-            'PubKey2': PubKey2,
-            'Sum': Sum,
-            'Wal': Wal,
-            'Hash1': Hash1,
-            'Hash2': Hash2,
-            'Pass': Pass,
-            'MesIn': MesIn,
-            'MesOut': MesOut,
-            'time': time,
-            'Comision': []
-        }
-        if Comis == None or Comis < conf.conf['Comis']:
-            x['Comis'] = conf.conf['Comis']
-        else:
-            x['Comis'] = Comis
-        return x
-
-    def ToJSON(dat):
-        # dat['Hash1'] = json.dumps(dat['Hash1'])
-        # dat['Hash2'] = json.dumps(dat['Hash2'])
-        return dat
-
-    def FromJSON(dat):
-        # dat['Hash1'] = json.loads(dat['Hash1'])
-        # dat['Hash2'] = json.loads(dat['Hash2'])
-        return dat
-
-
-class Tranzhs:
-    def Create(TS, AddressTo=None, AddressHashed=None):
-        x = {
-            'TS': TS,
-            'Users': [],
-            'resTO': 0.0,
-            'resAnti': 0.0,
-            'AddressTo': AddressTo,
-            'AddressHashed': AddressHashed
-        }
-        return x
-
-    def ToJSON(dat):
-        # i = 0
-        # while i<len(dat['TS']):
-        #     dat['TS'][i] = Tranzh.ToJSON(dat['TS'][i])
-        #     i+=1
-        return dat
-
-    def FromJSON(dat):
-        # i = 0
-        # while i<len(dat['TS']):
-        #     dat['TS'][i] = Tranzh.FromJSON(dat['TS'][i])
-        #     i+=1
-        return dat
-
-
-class UserOF:
-    def Create(Address='', PubKey=''):
-        conn = sql3connect(Path + '/exmp1.db')
-        c = conn.cursor()
-        c.execute(f'''SELECT Address FROM UserOF WHERE Address = '{Address}' ''')
-        if c.fetchone() is None:
-            c.execute(f'''INSERT OR IGNORE INTO UserOF VALUES(?, ?, ?, ?, ?, ?, ?)''',
-                      (Address, PubKey, False, json.dumps([]), json.dumps({}), 0, None))
-        conn.commit()
-        conn.close()
-        # return self
-
-    def FromSQL(x):
-        return {'Address': x[0], 'PubKey': x[1], 'Active': x[2], 'Masseges': json.loads(x[3]),
-                'Balance': json.loads(x[4]), 'Time': x[5]}
-
-    def ToSQL(x):
-        return [x['Address'], x['PubKey'], x['Active'], json.dumps(x['Masseges']), json.dumps(x['Balance']), x['Time']]
-
-    def Check(AC, a, RES):
-        a = decode(a, 256)
-        RES = PubCode(RES, AC['PubKey'])
-        return RES == a
-
-
-class Order:
-    def Create(Adr1, Wal1, AddressFrom, Sum1, Adr2, Wal2, k, time, priv):
-        conn = sql3connect(Path + '/exmp1.db')
-        c = conn.cursor()
-        c.execute(
-            f'''SELECT * FROM Orders WHERE Wallet1 = '{Wal1}' AND Wallet2 = '{Wal2}' AND Address1 = '{Adr1}' AND AddressFrom = '{AddressFrom}' AND Address2 = '{Adr2}' AND SumS = '{Sum1}' AND k = '{k}' AND t = '{time}' AND priv = '{priv}' ''')
-        if c.fetchone() is None:
-            c.execute(f'''INSERT OR IGNORE INTO Orders VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                      (Adr1, Adr2, AddressFrom, Wal1, Wal2, Sum1, Sum1, k, time, time, priv))
-        conn.commit()
-        conn.close()
-
-    def FromSQL(x):
-        return {'Address1': x[0], 'Address2': x[1], 'AddressFrom': x[2], 'Wallet1': x[3], 'Wallet2': x[4], 'Sum1': x[5],
-                'SumS': x[6], 'k': x[7], 't': x[8], 't1': x[9], 'priv': x[10]}
-
-    def ToSQL(x):
-        return [x['Address1'], x['Address2'], x['AddressFrom'], x['Wallet1'], x['Wallet2'], x['Sum1'], x['SumS'],
-                x['k'], x['t'], x['t1'], x['priv']]
-
-
-def get_conf():
-    # pass
-    conf.conf = getattr(conf.conf, '_conf', None)
-    if conf.conf is None:
-        conf.conf = shelve_open('conf')
-    return conf
 
 
 def PrivCode_list_S(dat):
@@ -2022,367 +1719,3 @@ def getDataForGraf_S(Wallet1, Wallet2, Time, lastTime):
 
 def GetPricesF_S(Wallet1, data):
     return {'Protocol': 'GetPricesF', 'Wallet1': Wallet1, 'data': data}
-
-
-def PrivCode_list_R(dat):
-    return PrivCode_list(dat['Data'])
-
-
-def generate_Private_R(dat):
-    return generate_Private(dat['Password'])
-
-
-def PubToAdr_R(dat):
-    return PubToAdr(dat['Public'])
-
-
-def AdrToPub_R(dat):
-    return AdrToPub(dat['Address'])
-
-
-def PrivToPub_R(dat):
-    return PrivToPub(dat['Password'])
-
-
-def PubCode_R(dat):
-    return str(PubCode(dat['Message'], dat['Public_key']))
-
-
-def PrivCode_R(dat):
-    return str(PrivCode(dat['Message'], dat['Public_key']))
-
-
-def CheckVer_R(dat):
-    return Version
-
-
-def UpDate_R(dat):
-    if dat['Version'] != conf.conf['Version']:
-        conf.conf['Version'] = dat['Version']
-        UpDate(dat['Version'])
-        conf.conf['ExitCode'] = 82
-        conf.conf.close()
-        os._exit(82)
-        # ReBorn()
-
-
-def GetConf_R(dat):
-    return {"Data": [
-        conf.conf['Version'],
-        conf.conf['Connected'],
-        conf.conf['SUPERIP'],
-        conf.conf['OurWallets'],
-        conf.conf['OtherWallets'],
-        conf.conf['InMemory'],
-        conf.conf['FullFreez'],
-        conf.conf['Block'],
-        conf.conf['Comis'],
-        conf.conf['Voiting'],
-        conf.conf['Voited'],
-        conf.conf['VoitingTime'],
-        conf.conf['VoitingTitle'],
-        conf.conf['VoitingDescription'],
-
-        conf.conf['Connected_TCP'],
-        conf.conf['SUPERIP_TCP']
-    ]}
-
-
-def VoteFor_R(dat):
-    VoteFor(dat['key'], dat['Address'], dat['Pass'])
-
-
-def ChangeVoiting_R(dat):
-    ChangeVoiting(dat['new'], dat['newTiltel'], dat['newDidk'])
-
-
-def UpdateVoiting_R(dat):
-    return conf.conf['Voiting']
-
-
-def GetAllData_R(dat):
-    dat = {}
-    print(Path + '/exmp1.db')
-    with open(Path + '/exmp1.db', 'rb') as input:
-        print('Sakaar/exmp1.db')
-        dat['Sakaar/exmp1.db'] = str(b64encode(input.read()), 'utf-8', errors='ignore').strip()
-    # print(dat)
-    return dat
-
-
-def CancelOrder_R(dat):
-    CancelOrder(dat['Stk'], dat['Pass'])
-
-
-def SendOrder_R(dat):
-    SendOrder(dat['Stk'])
-
-
-def get_Order_R(dat):
-    # print('get_Order')
-    return get_Order(dat['Wallet1'], dat['Wallet2'], dat['k'])
-
-
-def ANConACC_R(dat):
-    ANConACC(dat['Address'], dat['Wallet'], dat['AddressTo'], dat['Pass'])
-
-
-def CreateAccountS_R(dat):
-    CreateAccountS(dat['Login'], dat['Hash'])
-
-
-def get_UserOF_R(dat):
-    return get_UserOF(dat['Address'])
-
-
-def IsServer_R(dat):
-    return IsServer(dat['Address'])
-
-
-def AddWallet_R(dat):
-    AddWallet(dat['Wallet'])
-
-
-def ConACC_R(dat):
-    ConACC(dat['Address'], dat['Wallet'], dat['AddressTo'], dat['PrivKey'])
-
-
-def DelIP_R(dat):
-    DelIP(dat['IP'], dat['Pass'])
-
-
-def NewIP_R(dat):
-    NewIP(dat['IP'], dat['Pass'])
-
-
-def DelIP_TCP_R(dat):
-    DelIP_TCP(dat['IP'], dat['Pass'])
-
-
-def NewIP_TCP_R(dat):
-    NewIP_TCP(dat['IP'], dat['Pass'])
-
-
-def Activate_R(dat):
-    Activate(dat['Address'])
-
-
-def DisActivate_R(dat):
-    DisActivate(dat['Address'])
-
-
-def ResTranzh_R(dat):
-    ResTranzh(dat['Address'], Tranzhs.FromJSON(dat['Tranzh']), dat['res'], dat['Pass'])
-
-
-def SendTONODA_R(dat):
-    SendTONODA(dat['Address'], dat['Sum'], dat['Time'], dat['Pass'])
-
-
-def SendTranzh_R(dat):
-    SendTranzh(dat['Tranzh'])
-
-
-def GetUnUsedAddress_R(dat):
-    if conf.conf['isServer']:
-        conn = sql3connect(Path + '/exmp1.db')
-        c = conn.cursor()
-        c.execute(f'''SELECT Address FROM {dat['Wallet']} WHERE Address = '{dat['Address']}' ''')
-        tor = ''
-        if (c.fetchone() is None):
-            tor = '1'
-        else:
-            tor = '0'
-        conn.close()
-        return tor
-
-
-def get_User_R(dat):
-    return get_User(dat['Address'], dat['Wallet'])
-
-
-def Registr_R(dat):
-    Registr(dat['PubKey'], dat['Wallet'], dat['AddressTo'], dat['FuncH'], dat['Func'], dat['AddressFrom'])
-
-
-def RegistrOUT_R(dat):
-    return RegistrOUT(dat['Wallet'], dat['AddressTo'])
-
-
-def DelSUPERIP_R(dat):
-    DelSUPERIP(dat['IP'])
-
-
-def NewSUPERIP_R(dat):
-    NewSUPERIP(dat['IP'])
-
-
-def AddWalletOUT_R(dat):
-    AddWalletOUT(dat['Wallet'], dat['DataToConnect'])
-
-
-def getBalanceOUT_R(dat):
-    return getBalanceOUT(dat['Wallet'], dat['Address'])
-
-
-def SendOUT_P_R(sock, dat):
-    return SendOUT_P(dat['Address'], dat['AddressTo'], dat['Pass'], dat['Sum'], dat['Wallet'])
-
-
-def GetDataToSendOUT_R(dat):
-    return GetDataToSendOUT(dat['Sum'], dat['Wallet'])
-
-
-def getBalance_R(dat):
-    return getBalance(dat['Wallet'], dat['Address'])
-
-
-def getBalance_list_R(dat):
-    return getBalance_list(dat['Wallet'], dat['Addresses'])
-
-
-def getATran_R(dat):
-    return getATran(dat['Wallet'], dat['Address'])
-
-
-def getHTran_R(dat):
-    return getHTran(dat['Wallet'], dat['Address'], dat['Time'], dat['ofPub'])
-
-
-def getAOrder_R(dat):
-    return getAOrder(dat['Wallet'], dat['Address'])
-
-
-def getHOrder_R(dat):
-    return getHOrder(dat['Wallet'], dat['Address'])
-
-
-def getDataForGraf_R(dat):
-    return getDataForGraf(dat['Wallet1'], dat['Wallet2'], dat['Time'], dat['lastTime'])
-
-
-def GetPricesF_R(dat):
-    return GetPricesF(dat['Wallet1'], dat['data'])
-
-
-Functions_R_res = {
-    'Registr': Registr_R,
-    'getAOrder': getAOrder_R,
-    'getHOrder': getHOrder_R,
-    'get_User': get_User_R,
-    'GetUnUsedAddress': GetUnUsedAddress_R,
-    'get_UserOF': get_UserOF_R,
-    'IsServer': IsServer_R,
-    'UpdateVoiting': UpdateVoiting_R,
-    'GetConf': GetConf_R,
-    'CheckVer': CheckVer_R,
-    'GetAllData': GetAllData_R,
-    'RegistrOUT': RegistrOUT_R,
-    'get_Order': get_Order_R,
-    'getBalanceOUT': getBalanceOUT_R,
-    'SendOUT_P': SendOUT_P_R,
-    'GetDataToSendOUT': GetDataToSendOUT_R,
-    'getBalance': getBalance_R,
-    'getBalance_list': getBalance_list_R,
-    'getATran': getATran_R,
-    'getHTran': getHTran_R,
-    'GetPricesF': GetPricesF_R,
-    'getDataForGraf': getDataForGraf_R,
-    'generate_Private': generate_Private_R,
-    'PubToAdr': PubToAdr_R,
-    'AdrToPub': AdrToPub_R,
-    'PrivToPub': PrivToPub_R,
-    'PubCode': PubCode_R,
-    'PrivCode': PrivCode_R,
-    'PrivCode_list': PrivCode_list_R,
-}
-Functions_R = {
-    'SendTranzh': SendTranzh_R,
-    'SendTONODA': SendTONODA_R,
-    'ResTranzh': ResTranzh_R,
-    'CreateAccountS': CreateAccountS_R,
-    'ConACC': ConACC_R,
-    'ANConACC': ANConACC_R,
-    'Activate': Activate_R,
-    'DelIP': DelIP_R,
-    'NewIP': NewIP_R,
-    'DelIP_TCP': DelIP_TCP_R,
-    'NewIP_TCP': NewIP_TCP_R,
-    'DisActivate': DisActivate_R,
-    'ChangeVoiting': ChangeVoiting_R,
-    'VoteFor': VoteFor_R,
-    'UpDate': UpDate_R,
-    'SendOrder': SendOrder_R,
-    'AddWallet': AddWallet_R,
-    'CancelOrder': CancelOrder_R,
-    'NewSUPERIP': NewSUPERIP_R,
-    'DelSUPERIP': DelSUPERIP_R,
-    'AddWalletOUT': AddWalletOUT_R
-}
-
-get_conf()
-# 4a9fb18ec3bf.ngrok.io
-if 'HTTP_TCP' not in conf.conf:
-    conf.conf['HTTP_TCP'] = None
-if 'Connected' not in conf.conf:
-    conf.conf['Connected'] = [['127.0.0.1:10101', 'GrandBull']]
-if 'Connected_TCP' not in conf.conf:
-    conf.conf['Connected_TCP'] = [['4.tcp.ngrok.io', 11602, 'GrandBull']]
-if 'SUPERIP' not in conf.conf:
-    conf.conf['SUPERIP'] = []
-if 'SUPERIP_TCP' not in conf.conf:
-    conf.conf['SUPERIP_TCP'] = []
-if 'OurWallets' not in conf.conf:
-    conf.conf['OurWallets'] = []
-if 'OtherWallets' not in conf.conf:
-    conf.conf['OtherWallets'] = []
-if 'InMemory' not in conf.conf:
-    conf.conf['InMemory'] = []
-if 'FullFreez' not in conf.conf:
-    conf.conf['FullFreez'] = 0.0
-if 'Comis' not in conf.conf:
-    conf.conf['Comis'] = 0.001
-if 'Voiting' not in conf.conf:
-    conf.conf['Voiting'] = {}
-if 'Voited' not in conf.conf:
-    conf.conf['Voited'] = {}
-conf.conf['Version'] = Version
-if 'login' not in conf.conf:
-    conf.conf['login'] = ''
-if 'Link' not in conf.conf:
-    conf.conf['Link'] = 'DB';
-if 'isServer' not in conf.conf:
-    conf.conf['isServer'] = False
-if 'isSUPER' not in conf.conf:
-    conf.conf['isSUPER'] = False
-if 'In' not in conf.conf:
-    conf.conf['In'] = False
-if 'login' not in conf.conf:
-    conf.conf['login'] = ''
-if 'PrivKey' not in conf.conf:
-    conf.conf['PrivKey'] = ''
-if 'passw' not in conf.conf:
-    conf.conf['passw'] = ''
-if 'isRunning' not in conf.conf:
-    conf.conf['isRunning'] = False
-if 'Block' not in conf.conf:
-    conf.conf['Block'] = 0
-if conf.conf['isSUPER'] == False:
-    if not ('MyIP' not in conf.conf or conf.conf['MyIP'] is None):
-        DelIP(conf.conf['MyIP'])
-    conf.conf['MyIP'] = None
-    if not ('MyIP_TCP' not in conf.conf or conf.conf['MyIP_TCP'] is None):
-        DelIP(conf.conf['MyIP_TCP'])
-    conf.conf['MyIP_TCP'] = None
-if 'Key' not in conf.conf:
-    conf.conf[
-        'Key'] = 'AAAAgQCVyHesUOzUjebFgOfNy9kc0EfqmU8FJotUt4eO9JtdZ8pwBst0jx/p4Pcve/10zWCjYEQ5Iy/I37s30KjmKz0DiehxFJ79Mq8L8oDfY3i6uPOIk9kONeLYoovLjn/jUVYwfwYNJeNp6Q+bnqQkaTv+vAKECyoK3k0ThsURzkrUWw=='
-if 'VoitingTime' not in conf.conf:
-    conf.conf['VoitingTime'] = 0
-if 'VoitingDescription' not in conf.conf:
-    conf.conf['VoitingDescription'] = ""
-if 'VoitingTitle' not in conf.conf:
-    conf.conf['VoitingTitle'] = ""
-
-CheckVer()
-# DelIP('a3269702d87f.ngrok.io')

@@ -1,19 +1,27 @@
 import subprocess
-import pip,shelve
+import pip, shelve
+
 conf = None
+
+
 def install(package):
     if hasattr(pip, 'main'):
         pip.main(['install', package])
     else:
         pip._internal.main(['install', package])
-code = 81 # restart
+
+
+code = 81  # restart
+
+
 def get_conf():
     # pass
     global conf
-    conf = getattr(conf,'_conf',None)
+    conf = getattr(conf, '_conf', None)
     if conf is None:
         conf = shelve.open('conf')
     return conf
+
 
 while code == 82 or code == 81:
     if code == 82:
@@ -21,16 +29,16 @@ while code == 82 or code == 81:
         if 'Version' not in conf:
             pass
         else:
-            install("Sakaar=="+conf['Version'])
+            install("Sakaar==" + conf['Version'])
         conf['ExitCode'] = 1
         conf.close()
     try:
-        process = subprocess.Popen(['python',"Controler.py"])
+        process = subprocess.Popen(['python', "Controler.py"])
         process.wait()
     except Exception as e:
         pass
     try:
-        process = subprocess.Popen(['python3',"Controler.py"])
+        process = subprocess.Popen(['python3', "Controler.py"])
         process.wait()
     except Exception as e:
         pass

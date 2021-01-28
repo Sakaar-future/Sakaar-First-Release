@@ -16,6 +16,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='BitCore.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
 
+
 </head>
 
 <body class="body">
@@ -78,19 +79,19 @@
     <div class="nav_container" onmouseenter="bignav()" id="nav_wal">
         <div class="nav_main" onclick="onAccount()">
             <div class="user_logo">
-                <div class="user_logo_1" id="short_username">
-                    US
-                </div>
+                <a class="user_logo_1" id="short_username">
+                    <img width="50" height="50" id="user_logo" src="http://127.0.0.1:10101/user_logo/avatar2.png">
+                </a>
             </div>
-            <div class="user_name" id="user_name">UserName
+            <div class="user_name" id="user_name">User Name
             </div>
         </div>
         <div id="nav_wal_l">
             <hr align="center" width="75%" size="3" color="purple">
-            <div class="nav_element" onclick="World()">Search
+            <div class="nav_element" align="center" onclick="World()">Search
             </div>
             <hr align="center" width="75%" size="3" color="purple">
-            <div class="nav_element" onclick="AddWallet()">AddWallet
+            <div class="nav_element" align="center" onclick="AddWallet()">Add Wallet
             </div>
             <!-- <div class="nav_element">
             </div> -->
@@ -150,5 +151,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>

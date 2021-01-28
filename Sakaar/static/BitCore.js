@@ -78,7 +78,7 @@ if (!('MyIP' in conf)){
     conf['MyIP'] = null;
 }
 if (!('Connected' in conf)){
-    conf['Connected'] = ['2de0e412453b.ngrok.io'];
+    conf['Connected'] = [['127.0.0.1:10101','GrandBull']];
 }
 if (!('SUPERIP' in conf)){
     conf['SUPERIP'] = [];
@@ -147,7 +147,7 @@ async function Send_T1(dat,OUT = false){
     if (OUT == false){
         for (let ip of conf['Connected']){
             try{
-                res = await postData('https://' + String(ip)+ '/', data = dat);
+                res = await postData("http://" + String(ip[0]), data = dat);
                 if (res != null){
                     return res;
                 }
@@ -158,7 +158,7 @@ async function Send_T1(dat,OUT = false){
     }else{
         for (let ip of conf['SUPERIP']){
             try{
-                res = await postData('http://' + String(ip)+ '/', data = dat);
+                res = await postData("http://" + String(ip[0]), data = dat);
                 if (res != null){
                     return res;
                 }
@@ -180,8 +180,7 @@ async function postData(url = "", data = {}) {
              body: raw,
              redirect: 'follow'
     };
-
-    const lol =         await fetch("http://2de0e412453b.ngrok.io", requestOptions)
+    const lol =         await fetch(url, requestOptions)
              .then(response => response.json())
     return lol
 }
@@ -557,12 +556,7 @@ async function PreSendTranzh(lol){
         T1                             = Tranzh.Create(T[0], T[1], T[2], T[3], await sha256_16(mas[T[2]][T[0]]['Hash'] + Pass), await sha256_16(mas[T[2]][T[1]]['Hash'] + Pass), Pass, t, await PubCode(await decode(T[5], 256), T[1]), await PubCode(await decode(T[5], 256), T[0]), Comis);
         T1['Pass']                     = await PrivCode(await decode(T1['Pass'], 256), T[4]);
         mas[T[2]][T[0]]['Balance']     -= T[3];
-
-        if (len(mas[T[2]][T[1]]['AddressTo'] ) > 0 && mas[T[2]][T[1]]['AddressTo']== mas[T[2]][T[0]]['AddressTo'] ){
-            mas[T[2]][T[1]]['Balance']             += T[3];
-        }else{
-            mas[T[2]][T[1]]['Balance']             += T[3]*(1-Comis);
-        }
+        mas[T[2]][T[1]]['Balance']             += T[3] * (1-Comis);
         mas[T[2]][T[0]]['Hash']                 = T1['Hash1'];
         mas[T[2]][T[1]]['Hash']                 = T1['Hash2'];
         TS.push(T1);
@@ -604,6 +598,9 @@ async function get_User(Address, Wallet){
 }
 async function get_UserOF(Address){
     return await Send_T1(get_UserOF_S(Address));
+}
+async function PrivCode_list(dat){
+    return await Send_T1(PrivCode_list_S(dat));
 }
 
 //remace
